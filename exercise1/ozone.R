@@ -27,5 +27,5 @@ lm1 = lm(y~x-1)
 summary(lm1)
 betacovlm = vcov(lm1)
 
-# compare the difference of two methods
+# compare the diagonal elements of results
 (sqrt(diag(betacov))-sqrt(diag(betacovlm)))/sqrt(diag(betacovlm))
