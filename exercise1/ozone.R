@@ -1,3 +1,5 @@
+# In this script, we build a liner model of data of ozone concentration in LA on other atmospherical variable. We estimate
+# the covariance matrix of estimator beta through RMS of residual
 library(mlbench)
 ozone = data(Ozone, package='mlbench')
 
@@ -11,15 +13,17 @@ x = as.matrix(ozone[,2:10])
 # add an intercept
 x = cbind(1,x)
 
-# compute the estimator
-A=solve(t(x) %*% x) %*% t(x)
+# compute the estimator betahat
+A = solve(t(x) %*% x) %*% t(x)
 betahat = A %*% y
 
 # compute betacov from RMS
-dy=y-x %*% betahat
-sig=t(dy)%*%dy/(203-10)
-sigma=diag(sig[1][1],203,203)
-betacov=A%*%sigma%*%t(A)
+dy = y-x %*% betahat
+
+# sig is the variance of error, from which we will compute the covariance of estimator
+sig = t(dy)%*%dy/(203-10)
+sigma = diag(sig[1][1],203,203)
+betacov = A%*%sigma%*%t(A)
 
 # Now compare to lm
 # the 'minus 1' notation says not to fit an intercept (we've already hard-coded it as an extra column)
