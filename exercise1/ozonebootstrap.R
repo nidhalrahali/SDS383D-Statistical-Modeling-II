@@ -1,3 +1,5 @@
+# this script estimate the covariance matrix of the estimator (for the
+# linear model of ozone concentration) using bootstrap. 
 library(mlbench)
 ozone = data(Ozone, package='mlbench')
 
@@ -24,18 +26,17 @@ betacovboot=cov(boot)
 A=solve(t(x) %*% x) %*% t(x)
 betahat = A %*% y
 dy=y-x %*% betahat
-sig=t(dy)%*%dy/(203-10)
-sigma=diag(sig[1][1],203,203)
-betacov=A%*%sigma%*%t(A)
+sigma=t(dy)%*%dy/(203-10)
+betacov=A%*%t(A)*sigma[1][1]
 
 # compute cov using lm function
 lm1 = lm(y~x-1)
 betacovlm = vcov(lm1)
 
-# compare the diagonal elements of results
+# compare the diagonal elements of covariance matrix
 (diag(betacovboot)-diag(betacovlm))/diag(betacovlm)
 (diag(betacovboot)-diag(betacov))/diag(betacov)
 
-#compare all the results
+#compare all elements of covariance matrix, the off diagonal elements do not match well
 (betacovboot-betacovlm)/betacovlm
 (betacovboot-betacov)/betacovlm

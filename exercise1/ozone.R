@@ -1,4 +1,4 @@
-# In this script, we build a liner model of data of ozone concentration in LA on other atmospherical variable. We estimate
+# this script builds a liner model of data of ozone concentration in LA on other atmospherical variable. We estimate
 # the covariance matrix of estimator beta through RMS of residual
 library(mlbench)
 ozone = data(Ozone, package='mlbench')
