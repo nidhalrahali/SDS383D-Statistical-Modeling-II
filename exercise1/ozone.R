@@ -21,9 +21,8 @@ betahat = A %*% y
 dy = y-x %*% betahat
 
 # sig is the variance of error, from which we will compute the covariance of estimator
-sig = t(dy)%*%dy/(203-10)
-sigma = diag(sig[1][1],203,203)
-betacov = A%*%sigma%*%t(A)
+sigma = t(dy)%*%dy/(203-10)
+betacov = A%*%t(A)*sigma[1][1]
 
 # Now compare to lm
 # the 'minus 1' notation says not to fit an intercept (we've already hard-coded it as an extra column)
@@ -31,5 +30,5 @@ lm1 = lm(y~x-1)
 summary(lm1)
 betacovlm = vcov(lm1)
 
-# compare the diagonal elements of results
+# compare the diagonal elements of results by computing relative difference
 (sqrt(diag(betacov))-sqrt(diag(betacovlm)))/sqrt(diag(betacovlm))
