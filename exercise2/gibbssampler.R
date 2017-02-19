@@ -6,7 +6,8 @@ library(mvtnorm)
 # k: the prior covariance matrix
 # d: two times the shape of prior gamma distribution of omega
 # t: number of samples to be generated
-# the return of this function is all the estimators generated in the sample
+# the return of this function is all the beta generated in the sample
+# for further explanations of variables, see the excercise 2 solution.pdf
 gibbssampler=function(y,x,h,k,d,t){
   lambda = diag(1,dim(y)[1])
   omega = 1

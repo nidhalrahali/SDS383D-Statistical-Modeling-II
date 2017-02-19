@@ -11,7 +11,7 @@ defense = as.numeric(defense)
 
 # plot data point
 datapoint = cbind(defense,growth)
-plot(datapoint)
+plot(datapoint, xlab='Defense Spending',ylab='GDP Growth Rate')
 
 # add intercept
 defense = cbind(1,defense)
