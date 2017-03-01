@@ -25,3 +25,15 @@ lines(xnew,yhat,col="red")
 
 yhat=fitsmoother(x,y,x,7)
 residue=y-yhat
+plot(residue)
+
+h=matrix(ncol=length(x),nrow=length(x))
+
+var=sum(residue*residue)(length(x)-)
+
+for(i in 1:ncol(x)){
+  w=weight(x[i],x,h)
+  w=w/sum(w)
+  variance=tcrossprod(w,w)
+  yhigh[i]=tcrossprod(ynormalize,w)+ymean
+}
