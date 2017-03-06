@@ -24,6 +24,7 @@ yhat=fitsmoother(xnew,ydata,xdata,6.8)
 plot(ydata~xdata)
 lines(xnew,yhat,col="red")
 
+<<<<<<< HEAD
 ydatahat=fitsmoother(xdata,ydata,xdata,6.8)
 #ydataloghat=fitsmoother(xdata,log(ydata),xdata,6.8)
 residue=ydata-ydatahat
@@ -42,3 +43,19 @@ for(i in 1:ncol(xnew)){
 plot(ydata~xdata)
 lines(yhat+deltay~xnew)
 lines(yhat-deltay~xnew)
+=======
+yhat=fitsmoother(x,y,x,7)
+residue=y-yhat
+plot(residue)
+
+h=matrix(ncol=length(x),nrow=length(x))
+
+var=sum(residue*residue)(length(x)-)
+
+for(i in 1:ncol(x)){
+  w=weight(x[i],x,h)
+  w=w/sum(w)
+  variance=tcrossprod(w,w)
+  yhigh[i]=tcrossprod(ynormalize,w)+ymean
+}
+>>>>>>> origin/master
