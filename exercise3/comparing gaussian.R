@@ -1,3 +1,4 @@
+source('~/GitHub/SDS383D-course-work/exercise3/gaussian process.R')
 x=seq(0,1,by=0.001)
 
 # same d,t2, different t1

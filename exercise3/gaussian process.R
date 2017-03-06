@@ -26,3 +26,25 @@ gaussian=function(covfun,x,b,t1,t2){
   }
   return=rmvnorm(1,rep(0,length(x)),covariance)
 }
+
+covmatrix=function(x,covfun,b,t1,t2){
+  n=length(x)
+  covmatrix=matrix(ncol=n,nrow=n)
+  for(i in 1:n){
+    for (j in i:n){
+      covmatrix[i,j]=covfun(abs(x[i]-x[j]),b,t1,t2)
+      covmatrix[j,i]=covmatrix[i,j]
+    }
+  }
+  return=covmatrix
+}
+
+fitsmoother=function(xnew,y,x,covfun,b,t1,t2){
+  yhat=xnew
+  for(i in 1:ncol(xnew)){
+    C=solve(covmatrix(xnew[i],x,covfun,b,t1,t2))
+    w=C[1,2:ncol(C)]/C[1,1]
+    yhat[i]=-tcrossprod(y,w)
+  }
+  return=yhat
+}
