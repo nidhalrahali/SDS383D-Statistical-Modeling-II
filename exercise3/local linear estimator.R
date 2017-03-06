@@ -10,15 +10,21 @@ weight=function(x,xdata,h){
   s2=sum(s2)
   return=kernel(d/h)*(s2-s1*d)
 }
+smoothingmatrix=function(x,h){
+  H=matrix(ncol=length(x),nrow=length(x))
+  for(i in 1:ncol(x)){
+    w=weight(x[i],x,h)
+    H[i,]=w/sum(w)
+  }
+  return=H
+}
 
 fitsmoother=function(xnew,y,x,h){
-  ymean=mean(y)
-  ynormalize=y-ymean
   yhat=xnew
   for(i in 1:ncol(xnew)){
     w=weight(xnew[i],x,h)
     w=w/sum(w)
-    yhat[i]=tcrossprod(ynormalize,w)+ymean
+    yhat[i]=tcrossprod(y,w)
   }
   return=yhat
 }

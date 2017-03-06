@@ -28,11 +28,9 @@ points(x,ynoise)
 # ty:type of kernel, cl: color used to draw a line
 
 fitsmoother=function(y,x,h,ty,cl){
-  ymean=mean(y)
-  ynormalize=y-matrix(ymean,ncol=n)
   yhat=matrix(ncol=n)
   for(i in 1:ncol(y)){
-    yhat[i]=ynormalize %*% t(weight(x[i],x,h,type=ty))+ymean
+    yhat[i]=y %*% t(weight(x[i],x,h,type=ty))
   }
   lines(x,yhat,col=cl)
 }
