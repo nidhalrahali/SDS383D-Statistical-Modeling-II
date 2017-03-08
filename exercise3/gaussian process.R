@@ -48,3 +48,7 @@ fitsmoother=function(xnew,y,x,covfun,b,t1,t2){
   }
   return=yhat
 }
+
+logml=function(y,D){
+  return=-y %*% tcrossprod(D,y)/2-log(det(D))/2
+}
