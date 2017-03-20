@@ -1,7 +1,7 @@
 # this script generate a nonlinear function with gaussian noise
 # then use linear smoother to recover the function
 
-source('~/GitHub/SDS383D-course-work/exercise3/weight.R')
+source('~/GitHub/SDS383D-course-work/exercise3/linear smoothing/weight.R')
 
 # the function we use to generate data
 f=function(x){

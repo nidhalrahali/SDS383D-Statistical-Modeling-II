@@ -52,3 +52,7 @@ fitsmoother=function(xnew,y,x,covfun,b,t1,t2){
 logml=function(y,C){
   return=dmvnorm(y,sigma=C,log=TRUE)
 }
+
+distance=function(x1,y1,x2,y2,bx,by){
+  return=sqrt((x1-x2)^2/bx+(y1-y2)^2/by)
+}

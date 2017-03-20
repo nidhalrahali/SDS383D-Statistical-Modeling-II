@@ -1,4 +1,4 @@
-source('~/GitHub/SDS383D-course-work/exercise3/predictionerror.R')
+source('~/GitHub/SDS383D-course-work/exercise3/linear smoothing/weight.R')
 
 # smooth
 f=function(x){
