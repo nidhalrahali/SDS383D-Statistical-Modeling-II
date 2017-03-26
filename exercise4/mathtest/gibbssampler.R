@@ -1,0 +1,36 @@
+gibbssampler=function(gsum,gcount,d,eta,h,t){
+  n=sum(gcount)
+  m=length(gsum)
+  lambda=1
+  omega=1
+  dstar=d+n+m
+  hstar1=h+m
+  theta=gsum/gcount
+  for(i in seq(from=1,to=500)){
+    etastar=eta+sum(gsum^2-2*gsum*(1+theta)+gcount*theta*theta)+lambda*sum((theta-mu)^2)
+    hstar2=h+omega*sum((theta-mu)^2)
+    thetamean=(lambda*mu+gsum)/(lambda+gcount)
+    thetasd=sqrt(1/(omega*(lambda+gcount)))
+    mumean=mean(theta)
+    musd=sqrt(1/(m*lambda*omega))
+    lambda=rgamma(1,shape=hstar1/2,rate=hstar2/2)
+    omega=rgamma(1,shape=dstar/2,rate=etastar/2)
+    theta=rnorm(m,thetamean,thetasd)
+    mu=rnorm(1,mumean,musd)
+  }
+  ret=matrix(nrow=t,ncol=m)
+  for( i in 1:t){
+      etastar=eta+sum(gsum^2-2*gsum*(1+theta)+gcount*theta*theta)+lambda*sum((theta-mu)^2)
+      hstar2=h+omega*sum((theta-mu)^2)
+      thetamean=(lambda*mu+gsum)/(lambda+gcount)
+      thetasd=sqrt(1/(omega*(lambda+gcount)))
+      mumean=mean(theta)
+      musd=sqrt(1/(m*lambda*omega))
+      lambda=rgamma(1,shape=hstar1/2,rate=hstar2/2)
+      omega=rgamma(1,shape=dstar/2,rate=etastar/2)
+      theta=rnorm(m,thetamean,thetasd)
+      ret[i,]=theta
+      mu=rnorm(1,mumean,musd)
+  }
+  return=ret
+}

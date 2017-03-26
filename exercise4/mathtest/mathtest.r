@@ -11,24 +11,27 @@ sum( (mathtest$mathscore - pred)^2 )
 grandmean = mean(mathtest$mathscore)
 sum( (mathtest$mathscore - grandmean)^2 )
 
-schoolscore=rep(0,max(mathtest$school))
-schoolsize=rep(0,max(mathtest$school))
-for(i in 1:length(mathtest$school)){
-  schoolscore[mathtest$school[i]]=schoolscore[mathtest$school[i]]+mathtest$mathscore[i]
-  schoolsize[mathtest$school[i]]=schoolsize[mathtest$school[i]]+1
+m=100
+schoolsum=rep(0,m)
+schoolcount=rep(0,m)
+for(i in 1:length(mathtest$mathscore)){
+  schoolsum[mathtest$school[i]]=schoolsum[mathtest$school[i]]+mathtest$mathscore[i]
+  schoolcount[mathtest$school[i]]=schoolcount[mathtest$school[i]]+1
 }
-t=1000
-mu=grandmean
-sigmasq=1
-tausq=1
-theta=matrix(nrow=max(mathtest$school),ncol=t)
-for(i in 1:length(schoolscore)){
-theta[i,]=gibbssampler(totalschoolscore[i],schoolsize[i],t,mu,sigmasq,tausq)
-}
-thetamean=rowMeans(theta)
+t=2000
+d=10
+eta=10
+h=10
+theta=gibbssampler(schoolsum,schoolcount,d,eta,h,t)
+#use the mean of theta sample to predict the score 
+thetamean=colMeans(theta)
 plot(thetamean)
 predict=mathtest$mathscore
 for(i in 1:length(predict)){
   predict[i]=thetamean[mathtest$school[i]]
 }
 sum((mathtest$mathscore-predict)^2)
+
+schoolmean=schoolsum/schoolcount
+kappa=abs(schoolmean-thetamean)/schoolmean
+plot(kappa~schoolcount)
