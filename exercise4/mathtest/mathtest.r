@@ -1,10 +1,11 @@
-mathtest <- read.csv("~/GitHub/SDS383D-course-work/exercise4/mathtest.csv")
-boxplot(mathscore~school,data=mathtest)
+mathtest <- read.csv("~/GitHub/SDS383D-course-work/exercise4/mathtest/mathtest.csv")
+source('~/GitHub/SDS383D-course-work/exercise4/mathtest/gibbssampler.R')
+boxplot(mathscore~school,data=mathtest,xlab="school",ylab="math score")
 summary(mathtest)
 # fit a simple linear model for mathscore versus school
 lm1 = lm(mathscore ~ school, data=mathtest)
 pred = predict(lm1, mathtest)
-plot(pred, mathtest$mathscore)
+plot(mathtest$school,pred)
 sum( (mathtest$mathscore - pred)^2 )
 
 #compare with the grandmean of all scores
@@ -25,13 +26,14 @@ h=10
 theta=gibbssampler(schoolsum,schoolcount,d,eta,h,t)
 #use the mean of theta sample to predict the score 
 thetamean=colMeans(theta)
-plot(thetamean)
-predict=mathtest$mathscore
+boxplot(mathscore~school,data=mathtest,xlab="school",ylab="math score")
+points(thetamean,col="red")
 for(i in 1:length(predict)){
   predict[i]=thetamean[mathtest$school[i]]
 }
 sum((mathtest$mathscore-predict)^2)
 
+# compute the shrinkage
 schoolmean=schoolsum/schoolcount
 kappa=abs(schoolmean-thetamean)/schoolmean
-plot(kappa~schoolcount)
+plot(kappa~schoolcount,xlab="# of data in school")

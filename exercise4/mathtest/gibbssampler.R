@@ -1,6 +1,7 @@
 gibbssampler=function(gsum,gcount,d,eta,h,t){
   n=sum(gcount)
   m=length(gsum)
+  mu=sum(gsum)/n
   lambda=1
   omega=1
   dstar=d+n+m
