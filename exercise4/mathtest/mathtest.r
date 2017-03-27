@@ -24,10 +24,12 @@ d=10
 eta=10
 h=10
 theta=gibbssampler(schoolsum,schoolcount,d,eta,h,t)
-#use the mean of theta sample to predict the score 
+#use the mean of theta sample to predict the score
+plot(theta)
 thetamean=colMeans(theta)
 boxplot(mathscore~school,data=mathtest,xlab="school",ylab="math score")
 points(thetamean,col="red")
+predict=mathtest$mathscore
 for(i in 1:length(predict)){
   predict[i]=thetamean[mathtest$school[i]]
 }
