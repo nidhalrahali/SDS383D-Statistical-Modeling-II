@@ -1,0 +1,7 @@
+cheese <- read.csv("~/GitHub/SDS383D-course-work/exercise4/cheese/cheese.csv")
+summary(cheese)
+store=as.integer(cheese$store)
+logprice=log(cheese$price)
+logvol=log(cheese$vol)
+plot(logvol~logprice)
+plot(logvol~store)
