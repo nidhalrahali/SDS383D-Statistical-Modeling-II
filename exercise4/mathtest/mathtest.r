@@ -3,6 +3,7 @@ source('~/GitHub/SDS383D-course-work/exercise4/mathtest/gibbssampler.R')
 boxplot(mathscore~school,data=mathtest,xlab="school",ylab="math score")
 summary(mathtest)
 # fit a simple linear model for mathscore versus school
+mathtest$school=factor(mathtest$school)
 lm1 = lm(mathscore ~ school, data=mathtest)
 pred = predict(lm1, mathtest)
 plot(mathtest$school,pred)
