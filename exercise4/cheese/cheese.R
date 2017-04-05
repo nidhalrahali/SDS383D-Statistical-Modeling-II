@@ -2,6 +2,7 @@ library(lme4)
 library(dplyr)#$filter
 library(ggplot2)#ggplot
 library(mosaic)#xyplot
+source('~/GitHub/SDS383D-course-work/exercise4/cheese/gibbssampler.R')
 cheese <- read.csv("~/GitHub/SDS383D-course-work/exercise4/cheese/cheese.csv")
 summary(cheese)
 
@@ -9,6 +10,7 @@ cheese$store=as.integer(cheese$store)
 cheese$store=factor(cheese$store)
 cheese$logprice=log(cheese$price)
 cheese$logvol=log(cheese$vol)
+
 
 plot(cheese$logvol~cheese$logprice)
 boxplot(cheese$logvol~cheese$store)
@@ -53,3 +55,18 @@ cheese$p3=predict(model3,cheese)
 #almost no distinction between disp and non-disp 
 xyplot(p3 ~ logprice | store, data=cheese, type = c("p", "r"),  group = disp, auto.key = list(), par.strip.text=list(cex=0.5))
 
+cheese$pd=cheese$logprice*cheese$disp
+xx=array(dim=c(88,4,4))
+xy=matrix(nrow=4,ncol=88)
+yy=rep(1,88)
+p=rep(1,88)
+for(i in 1:88){
+  storedata=cheese%>%filter(store==i)
+y=as.matrix(storedata$logvol)
+p[i]=nrow(y)
+x=as.matrix(cbind(1,storedata$logprice,storedata$disp,storedata$pd))
+  xx[i,,]=crossprod(x,x)
+  xy[,i]=crossprod(x,y)
+  yy[i]=crossprod(y,y)
+}
+gibbssampler(xx,xy,yy,p,1000)
