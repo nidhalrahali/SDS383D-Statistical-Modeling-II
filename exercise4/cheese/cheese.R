@@ -59,23 +59,65 @@ cheese$pd=cheese$logprice*cheese$disp
 xx=array(dim=c(88,4,4))
 xy=matrix(nrow=4,ncol=88)
 yy=rep(1,88)
-p=rep(1,88)
 for(i in 1:88){
   storedata=cheese%>%filter(store==i)
 y=as.matrix(storedata$logvol)
-p[i]=nrow(y)
 x=as.matrix(cbind(1,storedata$logprice,storedata$disp,storedata$pd))
   xx[i,,]=crossprod(x,x)
   xy[,i]=crossprod(x,y)
   yy[i]=crossprod(y,y)
 }
-betasample=gibbssampler(xx,xy,yy,1000,5555)
+t=1000
+sampling=gibbssampler(xx,xy,yy,t,5555)
+betasample=sampling$betasample
+sigmasample=sampling$sigmasample
+siginvsample=sampling$siginvsample
 
+hist(1/siginvsample,xlab="sigma^2")
 
-store=cheese%>%filter(store==30)
-beta=betasample[30,,]
-betamean=colMeans(beta)
-xyplot()
-abline(betamean[1],betamean[2])
-panel.abline=c(betamean[1]+betamean[3],betamean[2]+betamean[4])
-boxplot(beta)
+betameanbystore=matrix(nrow=88,ncol=4)
+for(i in 1:88){
+  betameanbystore[i,]=colMeans(betasample[i,,])
+}
+
+lme4coef=as.matrix(coef(model1)$store)
+
+plotstore=function(st){
+  storedata=cheese%>%filter(store==st)
+  xl=c(min(storedata$logprice),max(storedata$logprice))
+  yl=c(min(storedata$logvol),max(storedata$logvol))
+plot(logvol~logprice,data=storedata%>%filter(disp==0),xlim=xl,ylim=yl,col='blue')
+points(logvol~logprice,data=storedata%>%filter(disp==1),col='red')
+abline(betameanbystore[st,1],betameanbystore[st,2],col='blue')
+abline(betameanbystore[st,1]+betameanbystore[st,3],betameanbystore[st,2]+betameanbystore[st,4],col='red')
+abline(lme4coef[st,4],lme4coef[st,2],lty='dashed',col='blue')
+abline(lme4coef[st,4]+lme4coef[st,1],lme4coef[st,3]+lme4coef[st,2],lty='dashed',col='red')
+}
+plotstore(15)
+plotstore(30)
+plotstore(40)
+
+intercept=matrix(nrow=88,ncol=t)
+slope=matrix(nrow=88,ncol=t)
+dispeffect1=matrix(nrow=88,ncol=t)
+dispeffect2=matrix(nrow=88,ncol=t)
+for(i in 1:88){
+  intercept[i,]=betasample[i,,1]
+  slope[i,]=betasample[i,,2]
+  dispeffect1[i,]=betasample[i,,3]
+  dispeffect2[i,]=betasample[i,,4]
+}
+boxplot(t(dispeffect1))
+points(lme4coef[,1],col="red")
+
+boxplot(t(dispeffect2))
+points(lme4coef[,3],col='red')
+
+boxplot(t(intercept))
+boxplot(t(slope))
+
+cheese$betameanpredict=cheese$logvol
+for(i in 1:5555){
+  cheese$betameanpredict[i]=betameanbystore[cheese$store[i],]%*%c(1,cheese$logprice[i],cheese$disp[i],cheese$pd[i])
+}
+xyplot(betameanpredict ~ logprice | store, data=cheese, type = c("p"),  group = disp, auto.key = list(), par.strip.text=list(cex=0.5))
