@@ -69,4 +69,13 @@ x=as.matrix(cbind(1,storedata$logprice,storedata$disp,storedata$pd))
   xy[,i]=crossprod(x,y)
   yy[i]=crossprod(y,y)
 }
-gibbssampler(xx,xy,yy,p,1000)
+betasample=gibbssampler(xx,xy,yy,1000,5555)
+
+
+store=cheese%>%filter(store==30)
+beta=betasample[30,,]
+betamean=colMeans(beta)
+xyplot()
+abline(betamean[1],betamean[2])
+panel.abline=c(betamean[1]+betamean[3],betamean[2]+betamean[4])
+boxplot(beta)
