@@ -29,7 +29,7 @@ p
 
 xyplot(logvol ~ logprice | store, data=cheese, type = c("p", "r"),  group = disp, auto.key = list(), par.strip.text=list(cex=0.5))
 
-
+#try 3 hierachical models with lmer
 model1=lmer(logvol~(disp+logprice+disp:logprice|store),data=cheese)
 summary(model1)
 coef(model1)
@@ -55,6 +55,7 @@ cheese$p3=predict(model3,cheese)
 #almost no distinction between disp and non-disp 
 xyplot(p3 ~ logprice | store, data=cheese, type = c("p", "r"),  group = disp, auto.key = list(), par.strip.text=list(cex=0.5))
 
+# use gibbs sampler to fit a model
 cheese$pd=cheese$logprice*cheese$disp
 xx=array(dim=c(88,4,4))
 xy=matrix(nrow=4,ncol=88)
@@ -82,6 +83,7 @@ for(i in 1:88){
 
 lme4coef=as.matrix(coef(model1)$store)
 
+#visualize the model with respect to a store and compare with lmer result
 plotstore=function(st){
   storedata=cheese%>%filter(store==st)
   xl=c(min(storedata$logprice),max(storedata$logprice))
