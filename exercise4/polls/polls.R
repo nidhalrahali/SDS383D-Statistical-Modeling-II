@@ -1,5 +1,6 @@
 library(lme4)
 library(dplyr)#$filter
+library(mosaic)
 polls <- read.csv("~/GitHub/SDS383D-course-work/exercise4/polls/polls.csv")
 polls=na.omit(polls)
 polls=polls[c(4,5,6,7,8,9,10)]
@@ -69,3 +70,5 @@ for(i in 1:length(statelist)){
 }
 plot(statepredict)
 plot(statepredict~pollbystate)
+
+plot(polls$pred~polls$weight)
