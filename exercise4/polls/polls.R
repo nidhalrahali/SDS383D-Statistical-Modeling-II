@@ -3,10 +3,8 @@ library(dplyr)#$filter
 library(mosaic)
 polls <- read.csv("~/GitHub/SDS383D-course-work/exercise4/polls/polls.csv")
 polls=na.omit(polls)
-polls=polls[c(4,5,6,7,8,9,10)]
+polls=polls[c(4,5,6,7,8,9)]
 summary(polls)
-
-hist(polls$weight)
 
 edulevel=c('NoHS','HS','SomeColl','Bacc')
 pollbyedu=rep(0,length(edulevel))
@@ -42,7 +40,7 @@ plot(pollbystate~statecount,xlab="number of polls",ylab="bush support rate")
 polls$edu=factor(polls$edu,levels=edulevel)
 polls$age=factor(polls$age,levels=agelevel)
 
-model=lmer(bush~edu+age+female+black+weight+(1|state),data=polls)
+model=lmer(bush~edu+age+female+black+(1|state),data=polls)
 summary(model)
 
 ranef(model)
@@ -72,3 +70,39 @@ plot(statepredict)
 plot(statepredict~pollbystate)
 
 plot(polls$pred~polls$weight)
+
+state=as.numeric(polls$state)
+y=as.vector(polls$bush)
+x=matrix(0,nrow=length(y),ncol=9)
+for(i in 1:length(y)){
+  x[i,1]=1
+  x[i,8]=polls$female[i]
+  x[i,9]=polls$black[i]
+  if(polls$edu[i]=="HS"){
+    x[i,2]=1
+  }
+  if(polls$edu[i]=="SomeColl"){
+    x[i,3]=1
+  }
+  if(polls$edu[i]=="Bacc"){
+    x[i,4]=1
+  }
+  if(polls$age[i]=="65plus"){
+    x[i,7]=1
+  }
+  if(polls$age[i]=="30to44"){
+    x[i,5]=1
+  }
+  if(polls$age[i]=="45to64"){
+    x[i,6]=1
+  }
+}
+beta=rep(0,9)
+mu=rep(0,49)
+lambdasq=1
+sigsq=1
+d=1
+eta=1
+t=2000
+tausq=1
+gibbssampler(y,x,state,beta,mu,statecount,lambdasq,sigsq,tausq,d,eta,t)
