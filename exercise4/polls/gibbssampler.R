@@ -14,8 +14,8 @@ gibbssampler=function(y,x,state,beta,mu,g,lambdasq,sigsq,tausq,d,eta,t){
   musample=matrix(nrow=t,ncol=m)
   muvarsample=matrix(nrow=t,ncol=m)
   for(i in 1:(1000+t)){
-    if(i==300){
-      i
+    if(i%%100==0){
+      print(i)
     }
     for(j in 1:n){
       zmean=tcrossprod(x[j,], beta)+mu[state[j]]
@@ -24,7 +24,7 @@ gibbssampler=function(y,x,state,beta,mu,g,lambdasq,sigsq,tausq,d,eta,t){
     } 
     zmu=z
     for(j in 1:n){
-      zmu[j]=z[i]-mu[state[j]]
+      zmu[j]=z[j]-mu[state[j]]
     }
     betavar=diag(1,f)/tausq+crossprod(x,x)/sigsq
     betavar=solve(betavar)
@@ -45,7 +45,7 @@ gibbssampler=function(y,x,state,beta,mu,g,lambdasq,sigsq,tausq,d,eta,t){
       musample[i-1000,]=mu
       muvarsample[i-1000,]=muvar
     }
-    betarms=crossprod(beta,beta)
+    betarms=tcrossprod(beta-t(betamean),beta-t(betamean))
     tausq=rgamma(1,shape=f/2,rate=betarms/2)
     tausq=1/tausq
     zrms=zmu-tcrossprod(x,beta)
@@ -60,5 +60,5 @@ gibbssampler=function(y,x,state,beta,mu,g,lambdasq,sigsq,tausq,d,eta,t){
     lambdasq=rgamma(1,shape=(d+m)/2,rate=(eta+murms)/2)
     lambdasq=1/lambdasq
   }
-  return=list()
+  return=list(betasample=betasample,betavarsample=betavarsample,musample=musample,muvarsample=muvarsample,sigsqsample=sigsqsample)
 }

@@ -69,8 +69,8 @@ for(i in 1:length(statelist)){
 plot(statepredict)
 plot(statepredict~pollbystate)
 
-plot(polls$pred~polls$weight)
 
+source('~/GitHub/SDS383D-course-work/exercise4/polls/gibbssampler.R')
 state=as.numeric(polls$state)
 y=as.vector(polls$bush)
 x=matrix(0,nrow=length(y),ncol=9)
@@ -105,4 +105,5 @@ d=1
 eta=1
 t=2000
 tausq=1
-gibbssampler(y,x,state,beta,mu,statecount,lambdasq,sigsq,tausq,d,eta,t)
+sample=gibbssampler(y,x,state,beta,mu,statecount,lambdasq,sigsq,tausq,d,eta,t)
+betasample=sample$betasample
