@@ -7,7 +7,7 @@ droslong$group=as.numeric(droslong$group)
 droslong$genelabel=as.numeric(droslong$gene)
 xyplot(log2exp~time|gene,data=droslong)
 xyplot(log2exp~time|group,data=droslong%>%filter(replicate=="A"))
-xyplot(log2exp~time|replicate,data=(droslong%>%filter(gene=="142798_at")))
+xyplot(log2exp~time|replicate,data=(droslong%>%filter(genelabel==1)))
 
 b=1
 C=matrix(nrow=12,ncol=12)
@@ -16,8 +16,18 @@ for(i in 1:12){
     C[i,j]=materncov(abs(i-j),b)
   }
 }
-Cinv=solve(10*C)
 gene=droslong$genelabel
 y=droslong$log2exp
 gr=droslong$group
 ti=droslong$time
+t=1000
+
+sample=gibbssampler(y,gene,gr,ti,C,t)
+hsample=sample$h
+fsample=sample$f
+genesample=matrix(nrow=12,ncol=t)
+for(i in 1:t)genesample[,i]=fsample[i,,1]+hsample[i,,3]
+boxplot(t(genesample),xlab="time",ylab="log2exp")
+lines(log2exp~time,data=(droslong%>%filter(genelabel==1,replicate=="A")))
+lines(log2exp~time,data=(droslong%>%filter(genelabel==1,replicate=="B")))
+lines(log2exp~time,data=(droslong%>%filter(genelabel==1,replicate=="C")))
