@@ -62,18 +62,18 @@ gibbssampler=function(y,gene,gr,ti,C,t){
       dif=y[j]-h[ti[j],gene[j]]-f[ti[j],gr[j]]
       rms[gene[j]]=rms[gene[j]]+dif^2
     }
-    sigma_eps=rgamma(1,shape=(2+total_data)/2,rate=sum(rms)/2)
+    sigma_eps=rgamma(1,shape=2+total_data/2,rate=sum(rms)/2)
     sigma_eps=1/sigma_eps
     for(j in 1:gene_number){
-      sigma_tau[j]=rgamma(1,shape=2.5,rate=rms[j]/2)
+      sigma_tau[j]=rgamma(1,shape=3.5,rate=rms[j]/2)
       dh=h[,j]-mh
-      sigma_h[j]=rgamma(1,shape=1,rate=crossprod(dh,Cinv)%*%dh/2)
+      sigma_h[j]=rgamma(1,shape=3.5,rate=crossprod(dh,Cinv)%*%dh/2)
     }
     sigma_tau=1/sigma_tau
     sigma_h=1/sigma_h
     for(j in 1:group_number){
       df=f[,j]-mf
-      sigma_f[j]=rgamma(1,shape=(2+group_size[j])/2,rate=crossprod(df,Cinv)%*%df/2)
+      sigma_f[j]=rgamma(1,shape=2+group_size[j]/2,rate=crossprod(df,Cinv)%*%df/2)
     }
     sigma_f=1/sigma_f
     if(i>1000){
