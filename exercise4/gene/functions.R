@@ -22,10 +22,15 @@ gibbssampler=function(y,gene,gr,ti,C,t){
   sigma_h=rep(1,gene_number)
   sigma_f=rep(1,group_number)
   f=matrix(mean(y),nrow=time_span,ncol=group_number)
-  e=f
+  mf=rowMeans(f)
   h=matrix(0,nrow=time_span,ncol=gene_number)
+  mh=rowMeans(h)
   hsample=array(dim=c(t,time_span,gene_number))
   fsample=array(dim=c(t,time_span,group_number))
+  sigma_eps_sample=rep(0,t)
+  sigma_f_sample=matrix(nrow=group_number,ncol=t)
+  sigma_h_sample=matrix(nrow=gene_number,ncol=t)
+  sigma_tau_sample=matrix(nrow=gene_number,ncol=t)
   for(i in 1:(1000+t)){
     hmean=matrix(0,nrow=time_span,ncol=gene_number)
     for(j in 1:total_data){
@@ -34,12 +39,10 @@ gibbssampler=function(y,gene,gr,ti,C,t){
     for(j in 1:gene_number){
       effsigma=(sigma_eps+sigma_tau[j])/(sigma_eps*sigma_tau[j])
       Vh=solve(3*diag(effsigma,time_span)+Cinv/sigma_h[j])
-      hmean[,j]=effsigma*(Vh%*%hmean[,j])
+      hmean[,j]=Vh%*%(effsigma*hmean[,j]+Cinv%*%mh/sigma_h[j])
       h[,j]=rmvnorm(1,mean=hmean[,j],sigma=Vh)
     }
-    if(i>1000){
-      hsample[i-1000,,]=h
-    }
+    mh=as.vector(rmvnorm(1,mean=rowMeans(h),sum(1/sigma_h)*C/14))
     fmean=matrix(0,nrow=time_span,ncol=group_number)
     for(j in 1:total_data){
       fmean[ti[j],gr[j]]=fmean[ti[j],gr[j]]+(y[j]-h[ti[j],gene[j]])*(1/sigma_eps+1/sigma_tau[gene[j]])
@@ -50,13 +53,10 @@ gibbssampler=function(y,gene,gr,ti,C,t){
         if(genelist[l]==j)effsigma=effsigma+1/sigma_tau[l]
       }
         Vf=solve(3*diag(effsigma,time_span)+Cinv/sigma_f[j])
-      fmean[,j]=Vf%*%(fmean[,j]+Cinv%*%e[,j]/sigma_f[j])
+      fmean[,j]=Vf%*%(fmean[,j]+Cinv%*%mf/sigma_f[j])
       f[,j]=rmvnorm(1,mean=fmean[,j],sigma=Vf)
-      e[,j]=rmvnorm(1,mean=f[,j],sigma=C/sigma_f[j])
     }
-    if(i>1000){
-      fsample[i-1000,,]=f
-    }
+    mf=as.vector(rmvnorm(1,mean=rowMeans(f),sum(1/sigma_f)*C/3))
     rms=rep(0,gene_number)
     for(j in 1:total_data){
       dif=y[j]-h[ti[j],gene[j]]-f[ti[j],gr[j]]
@@ -66,15 +66,24 @@ gibbssampler=function(y,gene,gr,ti,C,t){
     sigma_eps=1/sigma_eps
     for(j in 1:gene_number){
       sigma_tau[j]=rgamma(1,shape=2.5,rate=rms[j]/2)
-      sigma_h[j]=rgamma(1,shape=1,rate=t(h[,j])%*%Cinv%*%h[,j]/2)
+      dh=h[,j]-mh
+      sigma_h[j]=rgamma(1,shape=1,rate=crossprod(dh,Cinv)%*%dh/2)
     }
     sigma_tau=1/sigma_tau
     sigma_h=1/sigma_h
     for(j in 1:group_number){
-      fdif=f[,j]-e[,j]
-      sigma_f[j]=rgamma(1,shape=(2+group_size[j])/2,rate=t(fdif)%*%Cinv%*%fdif/2)
+      df=f[,j]-mf
+      sigma_f[j]=rgamma(1,shape=(2+group_size[j])/2,rate=crossprod(df,Cinv)%*%df/2)
     }
     sigma_f=1/sigma_f
+    if(i>1000){
+      hsample[i-1000,,]=h
+      fsample[i-1000,,]=f
+      sigma_f_sample[,i-1000]=sigma_f
+      sigma_h_sample[,i-1000]=sigma_h
+      sigma_tau_sample[,i-1000]=sigma_tau
+      sigma_eps_sample[i-1000]=sigma_eps
+    }
   }
-  return=list(h=hsample,f=fsample)
+  return=list(h=hsample,f=fsample,sf=sigma_f_sample,sh=sigma_h_sample,st=sigma_tau_sample,se=sigma_eps_sample)
 }
