@@ -1,0 +1,10 @@
+y=1
+sigma2=0.1
+mu=1
+h=seq(from=0.1,to=10,by=0.1)
+s=(1-2*exp(sigma2))/(1-exp(sigma2))+0.5
+r=(s-1)*exp(mu+sigma2/2)+y^2/2
+qmode=r/(1+s)
+c=1.1*p(y,qmode,sigma2,mu)/dinvgamma(qmode,scale=r,shape=s)
+plot(p(y,h,sigma2,mu)~h,type='l',col="red")
+lines(c*dinvgamma(h,shape=s,scale=r)~h,col="blue")
