@@ -1,4 +1,5 @@
 library(MCMCpack)
+library(truncnorm)
 
 p=function(y,h,sigma2,mu){
   return=h^(-1.5)*exp(-y^2/(2*h)-(log(h)-mu)^2/(2*sigma2))
@@ -59,16 +60,16 @@ sampler=function(y,nu_0,s_0,delta_0,sigma_delta2,alpha_0,sigma_alpha2,t){
     sum_ln_h2=sum(ln_h^2)
     ln_product=ln_h0*ln_h[1]+ln_h[n]*ln_hlast
     for(i in 1:(n-1))ln_product=ln_product+ln_h[i]*ln_h[i+1]
-    sigma_nu_scale=(s_0+n*alpha^2+(1+delta^2)*sum_ln_h2+delta^2*ln_h0^2+ln_hlast^2+2*alpha*(delta*ln_h0-(1-delta)*sum_ln_h-ln_hlast)-2*delta*ln_product)/2
-    sigma_nu2=rinvgamma(1,shape=(nu_0+n)/2,scale=sigma_nu_scale)
+    sigma_nu_scale=(s_0+(n+1)*alpha^2+(1+delta^2)*sum_ln_h2+delta^2*ln_h0^2+ln_hlast^2+2*alpha*(delta*ln_h0-(1-delta)*sum_ln_h-ln_hlast)-2*delta*ln_product)/2
+    sigma_nu2=rinvgamma(1,shape=(nu_0+n+1)/2,scale=sigma_nu_scale)
     deltamean=(sigma_nu2*delta_0+sigma_delta2*(ln_product-alpha*(sum_ln_h+ln_h0)))/(sigma_nu2+sigma_delta2*(sum_ln_h2+ln_h0^2))
-    delta=rnorm(1,mean=deltamean,sd=sqrt(sigma_nu2*sigma_delta2/(sigma_nu2+sigma_delta2*(sum_ln_h2+ln_h0^2))))
-    alphamean=(sigma_alpha2*(1-delta)*sum_ln_h+ln_hlast-ln_h0+sigma_nu2*alpha_0)/(sigma_nu2+n*sigma_alpha2)
+    delta=rtruncnorm(1,b=1,mean=deltamean,sd=sqrt(sigma_nu2*sigma_delta2/(sigma_nu2+sigma_delta2*(sum_ln_h2+ln_h0^2))))
+    alphamean=(sigma_alpha2*((1-delta)*sum_ln_h+ln_hlast-delta*ln_h0)+sigma_nu2*alpha_0)/(sigma_nu2+n*sigma_alpha2)
     alpha=rnorm(1,mean=alphamean,sd=sqrt(sigma_nu2*sigma_alpha2/(sigma_nu2+sigma_alpha2*n)))
     mu=computemu(ln_h,ln_h0,ln_hlast,delta,alpha)
     newh=h
     sigma2=sigma_nu2/(1+delta^2)
-    print(sigma_nu_scale)
+    print(delta)
     for(i in 1:n)newh[i]=nexth(y[i],h[i],sigma2,mu[i])
     h=newh
     ln_h0=rnorm(1,mean=alpha/(1-delta),sd=sqrt(sigma_nu2/(1-delta^2)))
