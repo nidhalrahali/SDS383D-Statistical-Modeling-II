@@ -27,5 +27,5 @@ y=na.omit(y)
 plot(y,type='l')
 log(sd(y))
 
-sample=sampler(y,1,1,0.5,0.1,1.2,0.1,1000)
-
+sample=sampler(y,1,1,0,0.1,0,0.1,1000)
+sample$alpha_sample

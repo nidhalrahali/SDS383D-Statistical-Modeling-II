@@ -64,16 +64,20 @@ sampler=function(y,nu_0,s_0,delta_0,sigma_delta2,alpha_0,sigma_alpha2,t){
     sigma_nu2=rinvgamma(1,shape=(nu_0+n+1)/2,scale=sigma_nu_scale)
     deltamean=(sigma_nu2*delta_0+sigma_delta2*(ln_product-alpha*(sum_ln_h+ln_h0)))/(sigma_nu2+sigma_delta2*(sum_ln_h2+ln_h0^2))
     delta=rtruncnorm(1,b=1,mean=deltamean,sd=sqrt(sigma_nu2*sigma_delta2/(sigma_nu2+sigma_delta2*(sum_ln_h2+ln_h0^2))))
+    sigma_delta2=rinvgamma(1,shape=1/2,scale=(delta-delta_0)^2/2)
     alphamean=(sigma_alpha2*((1-delta)*sum_ln_h+ln_hlast-delta*ln_h0)+sigma_nu2*alpha_0)/(sigma_nu2+n*sigma_alpha2)
     alpha=rnorm(1,mean=alphamean,sd=sqrt(sigma_nu2*sigma_alpha2/(sigma_nu2+sigma_alpha2*n)))
+    sigma_alpha2=rinvgamma(1,shape=1/2,scale=(alpha-alpha_0)^2/2)
     mu=computemu(ln_h,ln_h0,ln_hlast,delta,alpha)
     newh=h
     sigma2=sigma_nu2/(1+delta^2)
-    print(delta)
+    print(ln_h[1])
     for(i in 1:n)newh[i]=nexth(y[i],h[i],sigma2,mu[i])
     h=newh
-    ln_h0=rnorm(1,mean=alpha/(1-delta),sd=sqrt(sigma_nu2/(1-delta^2)))
-    ln_hlast=rnorm(1,mean=alpha/(1-delta),sd=sqrt(sigma_nu2/(1-delta^2)))
+    eps=rnorm(1,mean=0,sd=1)
+    ln_h0=(ln_h[1]-sqrt(sigma_nu2)*eps-alpha)/delta
+    eps=rnorm(1,mean=0,sd=1)
+    ln_hlast=alpha+delta*ln_h[n]+eps*sqrt(sigma_nu2)
     alpha_sample[ite]=alpha
     delta_sample[ite]=delta
     sigma_nu2_sample[ite]=sigma_nu2
