@@ -48,7 +48,7 @@ sampler=function(y,nu_0,s_0,delta_0,sigma_delta2,alpha_0,sigma_alpha2,t){
   sigma_nu2=rinvgamma(1,shape=(nu_0)/2,scale=s_0/2)
   delta=rtruncnorm(1,a=-1,b=1,mean=delta_0,sd=sqrt(sigma_delta2))
   alpha=rnorm(1,mean=alpha_0,sd=sqrt(sigma_alpha2))
-  h=sqrt(abs(y))
+  h=rep(1,n)
   h_sample=matrix(nrow=n,ncol=t)
   alpha_sample=rep(0,t)
   delta_sample=rep(0,t)
