@@ -28,4 +28,4 @@ plot(y,type='l')
 log(sd(y))
 
 sample=sampler(y,1,1,0,0.1,0,0.1,1000)
-sample$alpha_sample
+sample$h
