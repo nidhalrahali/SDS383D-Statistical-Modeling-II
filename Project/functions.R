@@ -37,8 +37,9 @@ sampler=function(y,nu_0,s_0,delta_0,sigma_delta2,alpha_0,sigma_alpha2,t){
   sigma_nu2=rinvgamma(1,shape=(nu_0)/2,scale=s_0/2)
   delta=rtruncnorm(1,a=-1,b=1,mean=delta_0,sd=sqrt(sigma_delta2))
   alpha=rnorm(1,mean=alpha_0,sd=sqrt(sigma_alpha2))
-  h0=sd(y)^2
-  h=rep(h0,n)
+  #h0=sd(y)^2
+  #h=rep(h0,n)
+  h=y^2
   h_sample=matrix(nrow=n,ncol=t)
   alpha_sample=rep(0,t)
   delta_sample=rep(0,t)
@@ -58,13 +59,13 @@ sampler=function(y,nu_0,s_0,delta_0,sigma_delta2,alpha_0,sigma_alpha2,t){
     alphasd=sqrt(sigma_nu2*sigma_alpha2/(sigma_nu2+(n-1)*sigma_alpha2))
     alpha=rnorm(1,mean=alphamean,sd=alphasd)
     mu=computemu(ln_h,delta,alpha)
-    newh=h
+    #newh=h
     print(sigma_nu2)
     #newh[1]=nexth(y[1],h[1],sigma_nu2/(delta^2),mu[1])
-    newh[n]=nexth(y[n],h[n],sigma_nu2,mu[n])
-    sigma2=sigma_nu2/(1+delta^2)
-    for(i in 2:(n-1))newh[i]=nexth(y[i],h[i],sigma2,mu[i])
-    h=newh
+    #newh[n]=nexth(y[n],h[n],sigma_nu2,mu[n])
+    #sigma2=sigma_nu2/(1+delta^2)
+    #for(i in 2:(n-1))newh[i]=nexth(y[i],h[i],sigma2,mu[i])
+    #h=newh
     if(ite>1000){
     alpha_sample[ite-1000]=alpha
     delta_sample[ite-1000]=delta

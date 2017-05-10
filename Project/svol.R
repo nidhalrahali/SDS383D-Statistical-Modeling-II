@@ -29,7 +29,7 @@ y2=y/10
 y3=y
 plot(y,type='l')
 
-sample=sampler(y1,1,1,0.5,0.1,0,0.1,1000)
+sample=sampler(y,1,1,0.5,0.1,0,0.1,1000)
 plot(sample$delta_sample,type='l',ylab="",main="delta")
 plot(sample$alpha_sample,type='l',ylab="",main="alpha")
 plot(sample$sigma_nu2_sample,type='l',ylab="",main="sigma_nu2")
