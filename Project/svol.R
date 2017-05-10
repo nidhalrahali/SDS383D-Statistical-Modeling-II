@@ -25,19 +25,13 @@ lines(ar1$ar*sp$S.P.500+ar1$x.intercept~seq(from=2,to=253),col="red")
 y=ar1$resid
 y=na.omit(y)
 y1=y/100
-y2=y/500
+y2=y/10
 y3=y
 plot(y,type='l')
 
-sample=sampler(y1,1,1,0.5,0.1,0,0.1,2000)
+sample=sampler(y1,1,1,0.5,0.1,0,0.1,1000)
 plot(sample$delta_sample,type='l',ylab="",main="delta")
 plot(sample$alpha_sample,type='l',ylab="",main="alpha")
 plot(sample$sigma_nu2_sample,type='l',ylab="",main="sigma_nu2")
 plot(log(sample$h_sample[,1000]),type='l',ylab="log(h)",main="1000th iteration")
-plot(log(sample$h_sample[100,]),type='l',ylab="log(h)",main="evolution of h100")
-
-sample=sampler(y2,1,1,0.5,0.1,0,0.1,2000)
-plot(log(sample$h_sample[100,]),type='l',ylab="log(h)",main="evolution of h100")
-
-sample=sampler(y3,1,1,0.5,0.1,0,0.1,2000)
 plot(log(sample$h_sample[100,]),type='l',ylab="log(h)",main="evolution of h100")

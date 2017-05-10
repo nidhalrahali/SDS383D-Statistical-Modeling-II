@@ -57,14 +57,14 @@ sampler=function(y,nu_0,s_0,delta_0,sigma_delta2,alpha_0,sigma_alpha2,t){
     alphamean=(sigma_alpha2*(((1-delta)*s1-ln_h[1]+delta*ln_h[n]))+sigma_nu2*alpha_0)/(sigma_nu2+(n-1)*sigma_alpha2)
     alphasd=sqrt(sigma_nu2*sigma_alpha2/(sigma_nu2+(n-1)*sigma_alpha2))
     alpha=rnorm(1,mean=alphamean,sd=alphasd)
-    #mu=computemu(ln_h,delta,alpha)
-    #newh=h
-    print(delta)
+    mu=computemu(ln_h,delta,alpha)
+    newh=h
+    print(sigma_nu2)
     #newh[1]=nexth(y[1],h[1],sigma_nu2/(delta^2),mu[1])
-    #newh[n]=nexth(y[n],h[n],sigma_nu2,mu[n])
-    #sigma2=sigma_nu2/(1+delta^2)
-    #for(i in 2:(n-1))newh[i]=nexth(y[i],h[i],sigma2,mu[i])
-    #h=newh
+    newh[n]=nexth(y[n],h[n],sigma_nu2,mu[n])
+    sigma2=sigma_nu2/(1+delta^2)
+    for(i in 2:(n-1))newh[i]=nexth(y[i],h[i],sigma2,mu[i])
+    h=newh
     if(ite>1000){
     alpha_sample[ite-1000]=alpha
     delta_sample[ite-1000]=delta
