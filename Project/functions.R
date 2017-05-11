@@ -28,7 +28,7 @@ computemu=function(ln_h,delta,alpha){
 
 
 
-sampler=function(y,nu_0,s_0,delta_0,sigma_delta2,alpha_0,sigma_alpha2,t){
+sampler=function(y,nu_0,s_0,delta_0,sigma_delta2,alpha_0,sigma_alpha2,t,burnin){
   n=length(y)
   delta=1
   alpha=0
@@ -38,7 +38,6 @@ sampler=function(y,nu_0,s_0,delta_0,sigma_delta2,alpha_0,sigma_alpha2,t){
   alpha_sample=rep(0,t)
   delta_sample=rep(0,t)
   sigma_nu2_sample=rep(0,t)
-  burnin=500
   for(ite in 1:(t+burnin)){
     if(ite%%100==0)print(ite)
     ln_h=log(h)
@@ -60,10 +59,14 @@ sampler=function(y,nu_0,s_0,delta_0,sigma_delta2,alpha_0,sigma_alpha2,t){
     newh=h
     #print(delta)
     #newh[1]=nexth(y[1],h[1],sigma_nu2/delta^2,mu[1])
-    newh[n]=nexth(y[n],h[n],sigma_nu2,mu[n])
+    #newh[n]=nexth(y[n],h[n],sigma_nu2,mu[n])
     sigma2=sigma_nu2/(1+delta^2)
     for(i in 2:(n-1))newh[i]=nexth(y[i],h[i],sigma2,mu[i])
     h=newh
+    eps=rnorm(1)
+    h[1]=exp(alpha+delta*log(h[2])+eps*sqrt(sigma_nu2))
+    eps=rnorm(1)
+    h[n]=exp(alpha+delta*log(h[n-1])+eps*sqrt(sigma_nu2))
     if(ite>burnin){
     alpha_sample[ite-burnin]=alpha
     delta_sample[ite-burnin]=delta
