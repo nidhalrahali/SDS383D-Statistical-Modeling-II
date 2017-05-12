@@ -47,7 +47,7 @@ sampler=function(y,nu_0,s_0,delta_0,sigma_delta2,alpha_0,sigma_alpha2,t,burnin,s
   alpha=0
   #h0=sd(y)^2
   #h=rep(h0,n)
-  h=rep(10,n)
+  h=y^2+0.0000001
   ln_h=log(h)
   h_sample=matrix(nrow=n,ncol=t)
   alpha_sample=rep(0,t)
@@ -66,7 +66,7 @@ sampler=function(y,nu_0,s_0,delta_0,sigma_delta2,alpha_0,sigma_alpha2,t,burnin,s
     
     deltamean=(sigma_nu2*delta_0+sigma_delta2*(s3-alpha*(s1-ln_h[n])))/(sigma_nu2+sigma_delta2*(s2-ln_h[n]^2))
     deltasd=sqrt(sigma_nu2*sigma_delta2/(sigma_nu2+sigma_delta2*(s2-ln_h[n]^2)))
-    delta=rtruncnorm(1,a=-1,b=1,mean=deltamean,sd=deltasd)
+    delta=rtruncnorm(1,a=0,b=1,mean=deltamean,sd=deltasd)
     
     alphamean=(sigma_alpha2*((1-delta)*s1-ln_h[1]+delta*ln_h[n])+sigma_nu2*alpha_0)/(sigma_nu2+(n-1)*sigma_alpha2)
     alphasd=sqrt(sigma_nu2*sigma_alpha2/(sigma_nu2+(n-1)*sigma_alpha2))
