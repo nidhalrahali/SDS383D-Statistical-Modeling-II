@@ -20,7 +20,7 @@ legend(x=6.8,y=0.25,legend=c("p","c=1","c=1.1","c=1.2"),fill=c("black","blue","r
 
 
 sp <- read.csv("~/GitHub/SDS383D-course-work/Project/SP1980-1987.csv")
-ix<-read.csv("~/GitHub/SDS383D-course-work/Project/IXIC2007-2010 w.csv")
+ix<-read.csv("~/GitHub/SDS383D-course-work/Project/IXIC2007-2010.csv")
 plot(ix$Close,type="l")
 ar1=ar.ols(x=sp$Close,order.max=1)
 lines(ar1$ar[1,1,1]*(sp$S.P.500-ar1$x.mean)+ar1$x.mean,col="red")
@@ -28,15 +28,15 @@ y=ar1$resid
 y=na.omit(y)
 plot(y,type='l')
 
-n=length(ix$Close)
-logchange=log(ix$Close[2:n])-log(ix$Close[1:(n-1)])
+n=length(sp$Close)
+logchange=log(sp$Close[2:n])-log(sp$Close[1:(n-1)])
 plot(logchange,type='l')
 
 
 y1=(sp$Close[2:n]-sp$Close[1:(n-1)])/sp$Close[1:(n-1)]
 plot(y1,type='l')
 
-sample=sampler(logchange,1,1,0,10,0,10,1000,0,0.0000001)
+sample=sampler(1000*logchange,1,1,0,10,0,10,2000,1000,0.001)
 plot(sample$delta_sample,type='l',ylab="",main="delta")
 hist(sample$delta_sample,xlab='delta',ylab="",main="delta")
 plot(sample$alpha_sample,type='l',ylab="",main="alpha")
