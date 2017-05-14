@@ -35,8 +35,9 @@ updateh=function(y,h,lhleft,lhright,alpha,delta,sigma_nu2){
 updateh_rw=function(y,h,lhleft,lhright,alpha,delta,sigma_nu2,sd_rw){
   sigma2=sigma_nu2/(1+delta^2)
   mu=(delta*(lhleft+lhright)+(1-delta)*alpha)/(1+delta^2)
-  hn=rtruncnorm(1,a=0,mean=h,sd=sd_rw)
-  accept=exp(ln_p(y,hn,sigma2,mu)-ln_p(y,h,sigma2,mu))*dtruncnorm(h,a=0,mean=hn,sd=sd_rw)/dtruncnorm(hn,a=0,mean=h,sd=sd_rw)
+  ln_hn=rnorm(1,mean=log(h),sd=sd_rw)
+  hn=exp(ln_hn)
+  accept=exp(ln_p(y,hn,sigma2,mu)-ln_p(y,h,sigma2,mu))*hn/h
   roll=runif(1)
   rej=0
   if(roll>accept){
@@ -46,10 +47,29 @@ updateh_rw=function(y,h,lhleft,lhright,alpha,delta,sigma_nu2,sd_rw){
   return=list(newh=hn,reject=rej)
 }
 
+updateh_rej=function(y,lhleft,lhright,alpha,delta,sigma_nu2){
+  sigma2=sigma_nu2/(1+delta^2)
+  mu=(delta*(lhleft+lhright)+(1-delta)*alpha)/(1+delta^2)
+  mu=mu+sigma2/2*(y^2*exp(-mu)-1)
+  ln_hn=rnorm(1,mean=mu,sd=sqrt(sigma2))
+  accept=y^2*(exp(-mu)*(1+mu-ln_hn)-exp(-ln_hn))/2
+  accept=exp(accept)
+  roll=runif(1)
+  rej=0
+  while(roll>accept){
+    ln_hn=rnorm(1,mean=mu,sd=sqrt(sigma2))
+    accept=y^2*(exp(-mu)*(1+mu-ln_hn)-exp(-ln_hn))/2
+    accept=exp(accept)
+    roll=runif(1)
+  }
+  return=list(newh=exp(ln_hn),reject=rej)
+}
+
 sampler=function(y,nu_0,s_0,delta_0,sigma_delta2,alpha_0,sigma_alpha2,t,burnin,sd_rw){
   n=length(y)
   delta=1
   alpha=0
+  sigma_nu2=0.1
   h0=sd(y)^2
   h=rep(h0,n)
   #h=y^2+0.0000001
@@ -62,6 +82,20 @@ sampler=function(y,nu_0,s_0,delta_0,sigma_delta2,alpha_0,sigma_alpha2,t,burnin,s
   rej=0
   for(ite in 1:(t+burnin)){
     if(ite%%100==0)print(ite)
+    
+    for(i in 2:(n-1)){
+      #r=updateh(y[i],h[i],ln_h[i-1],ln_h[i+1],alpha,delta,sigma_nu2)
+      #r=updateh_rw(y[i],h[i],ln_h[i-1],ln_h[i+1],alpha,delta,sigma_nu2,sd_rw)
+      r=updateh_rej(y[i],ln_h[i-1],ln_h[i+1],alpha,delta,sigma_nu2)
+      h[i]=r$newh
+      rej=rej+r$reject
+      upd=upd+1
+      ln_h[i]=log(h[i])
+    }
+    ln_h[1]=rnorm(1,mean=alpha+delta*ln_h[2],sd=sqrt(sigma_nu2))
+    h[1]=exp(ln_h[1])
+    ln_h[n]=rnorm(1,mean=alpha+delta*ln_h[n-1],sd=sqrt(sigma_nu2))
+    h[n]=exp(ln_h[n])
     s1=sum(ln_h)
     s2=sum(ln_h^2)
     s3=sum(ln_h[1:(n-1)]*ln_h[2:n])
@@ -77,19 +111,6 @@ sampler=function(y,nu_0,s_0,delta_0,sigma_delta2,alpha_0,sigma_alpha2,t,burnin,s
     alphasd=sqrt(sigma_nu2*sigma_alpha2/(sigma_nu2+(n-1)*sigma_alpha2))
     alpha=rnorm(1,mean=alphamean,sd=alphasd)
     #print(delta)
-    
-    for(i in 2:(n-1)){
-        #r=updateh(y[i],h[i],ln_h[i-1],ln_h[i+1],delta,alpha,sigma_nu2)
-        r=updateh_rw(y[i],h[i],ln_h[i-1],ln_h[i+1],delta,alpha,sigma_nu2,sd_rw)
-        h[i]=r$newh
-        rej=rej+r$reject
-        upd=upd+1
-        ln_h[i]=log(h[i])
-    }
-    ln_h[1]=rnorm(1,mean=alpha+delta*ln_h[2],sd=sqrt(sigma_nu2))
-    h[1]=exp(ln_h[1])
-    ln_h[n]=rnorm(1,mean=alpha+delta*ln_h[n-1],sd=sqrt(sigma_nu2))
-    h[n]=exp(ln_h[n])
     
     if(ite>burnin){
     alpha_sample[ite-burnin]=alpha

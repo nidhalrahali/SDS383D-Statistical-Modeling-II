@@ -28,21 +28,22 @@ y=ar1$resid
 y=na.omit(y)
 plot(y,type='l')
 
-n=length(sp$Close)
-logchange=log(sp$Close[2:n])-log(sp$Close[1:(n-1)])
-plot(logchange,type='l')
+n=length(ix$Close)
+logchange=log(ix$Close[2:n])-log(ix$Close[1:(n-1)])
+plot(4000*logchange,type='l')
 
 
 y1=(sp$Close[2:n]-sp$Close[1:(n-1)])/sp$Close[1:(n-1)]
 plot(y1,type='l')
 
-sample=sampler(1000*logchange,1,1,0,10,0,10,2000,1000,0.001)
+sample=sampler(logchange,1,1,0,10,0,10,2000,1000,0.1)
 plot(sample$delta_sample,type='l',ylab="",main="delta")
 hist(sample$delta_sample,xlab='delta',ylab="",main="delta")
 plot(sample$alpha_sample,type='l',ylab="",main="alpha")
 hist(sample$alpha_sample,xlab='alpha',ylab="",main="alpha")
 plot(sample$sigma_nu2_sample,type='l',ylab="",main="sigma_nu2")
 hist(sample$sigma_nu2_sample,ylab="",main="sigma_nu2")
-plot(log(sample$h_sample[,1000]),type='l',ylab="log(h)",main="1000th iteration")
-plot(log(sample$h_sample[100,]),type='l',ylab="log(h)",main="evolution of h")
+plot(log(sample$h_sample[10,]),type='l',ylab="log(h)",main="evolution of h")
 sample$rejectionrate
+logmean=log(rowMeans(sample$h_sample))
+plot(logmean[2:(n-10)],type='l',ylab="log(h)",main="log of posterior mean of h")
