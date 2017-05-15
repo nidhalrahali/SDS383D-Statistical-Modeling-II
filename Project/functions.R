@@ -93,8 +93,8 @@ sampler=function(y,nu_0,s_0,delta_0,sigma_delta2,alpha_0,sigma_alpha2,t,burnin,s
     if(ite%%500==0)print(ite)
     
     for(i in 2:(n-1)){
-      r=updateh(y[i],h[i],ln_h[i-1],ln_h[i+1],alpha,delta,sigma_nu2)
-      #r=updateh_rw(y[i],h[i],ln_h[i-1],ln_h[i+1],alpha,delta,sigma_nu2,sd_rw)
+      #r=updateh(y[i],h[i],ln_h[i-1],ln_h[i+1],alpha,delta,sigma_nu2)
+      r=updateh_rw(y[i],h[i],ln_h[i-1],ln_h[i+1],alpha,delta,sigma_nu2,sd_rw)
       #r=updateh_rej(y[i],ln_h[i-1],ln_h[i+1],alpha,delta,sigma_nu2)
       h[i]=r$newh
       upd=upd+1
@@ -131,4 +131,12 @@ sampler=function(y,nu_0,s_0,delta_0,sigma_delta2,alpha_0,sigma_alpha2,t,burnin,s
   }
   }
   return=list(h_sample=h_sample,alpha_sample=alpha_sample,delta_sample=delta_sample,sigma_nu2_sample=sigma_nu2_sample,rejectionrate=rej/trial,repeatrate=rep/upd)
+}
+
+simulate=function(delta,sigma_nu2,n){
+  ln_h=rep(0,n)
+  y=rep(0,n)
+  for(i in 2:n)ln_h[i]=rnorm(1,mean=delta*ln_h[i-1],sd=sqrt(sigma_nu2))
+  for(i in 1:n)y[i]=rnorm(1,sd=exp(ln_h[i]/2))
+  return=list(y=y,ln_h=ln_h)
 }

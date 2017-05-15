@@ -4,21 +4,19 @@
 \section{Introduction}
 The variance of returns of assets tends to change over time. The stochastic volatility model (SV) attempts to model this variance by assuming that they follow some latent stochastic process. It appeared first in the literature of theoretical finance on option pricing, though empirical models are usually described in discrete way. There is evidence the SV models offer increased flexibility over the GARCH family (Geweke(1994)).
 
-However, even the simplest SV model is difficult to fit due to various reasons. Naive strategy of maximum likelihood estimation fails due to the fact that the marginal distribution is evaluated in high dimensional space. Monte Carlo Markov Chain (MCMC), on the other hand, faces difficulty in simulating some non-analytical distributions and people needs to resort to indirect approach such as Metroplis-Hastings algorithm or reject-accept sampling. The topic of this essay will be to analyse the MCMC algorithm for SV model. Instead of general theory, we will focus on a simple SV model where the underling stochastic process is a log-normal autoregressive process. As for the MCMC, we will implement some specific algorithms and test their performance on both artificial and real world data.
-
-The outline of this essay is following. We will introduce the model in section 2.  In section 3, we derive the Bayesian posterior distribution and review three MCMC algorithms to fit the model. In order to compare them quantitatively, in section 4 we held a "competition": We will generate a fake data with underlying model and test which method can recover the hidden parameters. In section 5, we will apply the model on the real world data with these methods and check their results and performance.
+The outline of this essay is following. We will introduce the simplest version of SV model where the underly stochastic process is an log-normal autoregressive process. We derive the Bayesian posterior distribution and propose an MCMC algorithm to fit the model. The MCMC has to face a distribution with non-analytic expression and thus difficult to simulate. We will list three possible methods appeared in literature to overcome this difficulty.  In order to compare them quantitatively, we will hold a "competition" across these methods: We will generate a fake data with underlying model and test which method can give the lowest square error. Then we will apply the model on the same set of real world data with these methods and check their results and performance.
 \section{Basic Model}
-$y_t$ is the financial series we are interested in with zero mean. The model is
+$y$ is the financial series we are interested in with zero mean. The model is
 \[
-y_t=\sqrt{h_t}u_t
+y(t)=\sqrt{h(t)}u(t)
 \]
 \[
-\ln(h_t)=\alpha+\delta\ln(h_{t-1})+\sigma_\nu\nu_t
+\ln(h(t))=\alpha+\delta\ln(h(t-1))+\sigma_\nu\nu(t)
 \]
 \[
-u_t,\nu_t\sim N(0,1)
+u(t),\nu(t)\sim N(0,1)
 \]
-$h_t$ is a latent variable measuring the volatility of $y$, $\delta$ is the volatility persistence.
+$h_t$ is a latent variable measuring the volitility of $y$, $\delta$ is the volatility persistence.
 
 \section{Bayesian Analysis}
 \subsection{MCMC}
@@ -195,13 +193,13 @@ $h^i_t=h^*_t$
 \subsection{Data}
 We will set $\alpha=0$, $\delta=0.95$, $\sigma_\nu^2=0.1$, $\ln h_1=0$ and generate a sequence of 1000 $\ln h_t$ and $y_t$ following the model.
 \[
-y_t=\sqrt{h_t}u_t
+y(t)=\sqrt{h(t)}u(t)
 \]
 \[
-\ln(h_t)=\alpha+\delta\ln(h_{t-1})+\sigma_\nu\nu_t
+\ln(h(t))=\alpha+\delta\ln(h(t-1))+\sigma_\nu\nu(t)
 \]
 \[
-u_t,\nu_t\sim N(0,1)
+u(t),\nu(t)\sim N(0,1)
 \]
 \subsection{Result}
 We fit the artificial data with five methods: MH random walk with three different "speed" $e$, and the other two methods. We will address them as "MH $+$ RW with $e=\dots$", "MH $+$ RA", "RA", respectively.
@@ -229,7 +227,7 @@ For $h$, we take the prediction of each model on $h$ to be the mean of correspon
 
 \section{Test of Three Sampling Method: S$\&$P500}
 \subsection{Data}
-For this section, we use the S$\&$P500 from 1/1/2007 to 12/31/2010. As in Jacquier(1994) and Gallant(1992), we study the change of log of closing price:
+For this section, we use the S$\&$P500 from 1/1/2007 to 12/31/2010. As in Jacquier(1994) and Gallant(1992), we study the change of log of closing price every trading day:
 \[
 y_t=\log(price_{t+1}/price_t)
 \]
@@ -240,7 +238,7 @@ $y$ are plotted in Figure $\ref{9}$. There are 1008 data points in the time seri
 \caption{Daily change of S$\&$P500 closing price from 2007-2010}\label{9}
 \end{figure}
 \subsection{Result}
- For prior we take $\delta\sim N(0,10)$, $\alpha\sim N(0,10)$ and $\sigma_\nu^2\sim IG(\frac{1}{2},\frac{1}{2})$. We simulate the MCMC for 12000 iterations, and all the posterior results are based on the sample collected after 4000th iteration. We list the result of parameters in Table $\ref{2}$. The numbers outside and inside bracket are posterior mean and standard deviations respectively. It is observed that MH $+$ RA gives a highest persistence and smallest standard deviation on all parameters, and pure RA always gives the highest standard deviation and covariance. From Figure $\ref{3}$ to $\ref{4}$ we give all histograms of these variables.
+ For prior we take $\delta\sim N(0,10)$, $\alpha\sim N(0,10)$ and $\sigma_\nu^2\sim IG(\frac{1}{2},\frac{1}{2})$. We simulate the MCMC for 12000 iterations, and all the posterior results are based on the sample collected after 4000th iteration. We list the result of parameters in Table $\ref{2}$. The numbers outside and inside bracket are posterior mean and standard deviations respectively. From Figure $\ref{3}$ to $\ref{4}$ we give all histograms of these variables. For each $h_t$, we compute its sample mean and plot the log of the mean in Figure $\ref{5}$
 
 \begin{table}
 \centering
@@ -262,7 +260,6 @@ RA& 0.974(0.01) & -0.223(0.089) & 0.071(0.017)&8.97&-1&-8.9\\
 \end{tabular}
 \caption{Results of fitting SV model on S$\&$P500 daily log change}\label{2}
 \end{table}
-For each $h_t$, we compute its sample mean and plot the log of the mean in Figure $\ref{5}$. It is a relief to observe that all five pictures reflects the abrupt change in the middle of Figure $\ref{9}$ (caused by the financial crisis) by showing a peak at the same position. Their trend are also very similar, but curiously MH $+$ RA gives a smoother plot.
 \begin{figure}
 \centering
 \includegraphics[scale=0.2]{hmrw1halpha}\includegraphics[scale=0.2]{hmrw1hdelta}\includegraphics[scale=0.2]{hmrw1hsig}

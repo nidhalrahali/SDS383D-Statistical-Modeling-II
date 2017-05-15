@@ -1,5 +1,4 @@
 library(stats)
-library(fGarch)
 source('~/GitHub/SDS383D-course-work/Project/functions.R')
 
 x=0.01
@@ -17,13 +16,13 @@ lines(1.2*c*dinvgamma(h,shape=s,scale=r)~h,col="green")
 legend(x=6.8,y=0.25,legend=c("p","c=1","c=1.1","c=1.2"),fill=c("black","blue","red","green"))
 
 
-sp <- read.csv("~/GitHub/SDS383D-course-work/Project/N225.csv")
+sp <- read.csv("~/GitHub/SDS383D-course-work/Project/SP.csv")
 n=length(sp$Close)
 logchange=log(sp$Close[2:n])-log(sp$Close[1:(n-1)])
 plot(logchange,type='l',xlab='',ylab='log of price')
 
 proc.time()
-sample=sampler(logchange,1,1,0,10,0,10,8000,4000,0.3)
+sample=sampler(mockdata$y,1,1,0,10,0,10,8000,4000,0.3)
 proc.time()
 plot(sample$delta_sample,type='l',ylab="",main="delta")
 hist(sample$delta_sample,xlab='',ylab="",breaks=20,main="histogram of delta")
@@ -34,7 +33,7 @@ hist(sample$sigma_nu2_sample,xlab='',ylab="",main="histogram of sigma_nu^2")
 plot(log(sample$h_sample[100,]),type='l',ylab="log(h)",xlab="iteration",main="evolution of h")
 sample$rejectionrate
 logmean=log(rowMeans(sample$h_sample))
-plot(logmean[2:(n-10)],type='l',ylab="log(h)",main="log of posterior mean of h")
+plot(logmean,type='l',ylab="log(h)",main="log of posterior mean of h")
 
 dat=hmrw3
 a=dat$alpha_sample
@@ -54,4 +53,4 @@ acf(a,lag.max=8000,main="correlagram of alpha")
 acf(d,lag.max=8000,main="correlagram of delta")
 acf(s,lag.max=8000,main="correlagram of sigma_nu^2")
 
-gm=garchFit(data=logchange)
+mockdata=simulate(0.95,0.1,1000)
