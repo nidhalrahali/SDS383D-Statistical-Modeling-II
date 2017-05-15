@@ -15,21 +15,25 @@ updateh=function(y,h,lhleft,lhright,alpha,delta,sigma_nu2){
   hn=rinvgamma(1,shape=s,scale=r)
   accept1=exp(ln_p(y,hn,sigma2,mu)-ln_c)/dinvgamma(hn,scale=r,shape=s)
   roll=runif(1)
+  tr=1
+  rej=0
+  rep=0
   while(roll>accept1){
     hn=rinvgamma(1,shape=s,scale=r)
     accept1=exp(ln_p(y,hn,sigma2,mu)-ln_c)/dinvgamma(hn,scale=r,shape=s)
     roll=runif(1)
+    tr=tr+1
+    rej=rej+1
   }
-  rej=0
   if(accept1>=1){
   accept2=exp(ln_p(y,hn,sigma2,mu)-ln_p(y,h,sigma2,mu)+log(dinvgamma(h,scale=r,shape=s))-log(dinvgamma(hn,scale=r,shape=s)))
   roll=runif(1)
   if(roll>accept2){
-      rej=1
+      rep=1
       hn=h
   }
   }
-  return=list(newh=hn,reject=rej)
+  return=list(newh=hn,rep=rep,reject=rej,trial=tr)
 }
 
 updateh_rw=function(y,h,lhleft,lhright,alpha,delta,sigma_nu2,sd_rw){
@@ -39,12 +43,12 @@ updateh_rw=function(y,h,lhleft,lhright,alpha,delta,sigma_nu2,sd_rw){
   hn=exp(ln_hn)
   accept=exp(ln_p(y,hn,sigma2,mu)-ln_p(y,h,sigma2,mu))*hn/h
   roll=runif(1)
-  rej=0
+  rep=0
   if(roll>accept){
     hn=h
-    rej=1
+    rep=1
   }
-  return=list(newh=hn,reject=rej)
+  return=list(newh=hn,rep=rep,reject=0,trial=1)
 }
 
 updateh_rej=function(y,lhleft,lhright,alpha,delta,sigma_nu2){
@@ -56,13 +60,16 @@ updateh_rej=function(y,lhleft,lhright,alpha,delta,sigma_nu2){
   accept=exp(accept)
   roll=runif(1)
   rej=0
+  tr=1
   while(roll>accept){
     ln_hn=rnorm(1,mean=mu,sd=sqrt(sigma2))
     accept=y^2*(exp(-mu)*(1+mu-ln_hn)-exp(-ln_hn))/2
     accept=exp(accept)
     roll=runif(1)
+    tr=tr+1
+    rej=rej+1
   }
-  return=list(newh=exp(ln_hn),reject=rej)
+  return=list(newh=exp(ln_hn),rep=0,reject=rej,trial=tr)
 }
 
 sampler=function(y,nu_0,s_0,delta_0,sigma_delta2,alpha_0,sigma_alpha2,t,burnin,sd_rw){
@@ -78,18 +85,22 @@ sampler=function(y,nu_0,s_0,delta_0,sigma_delta2,alpha_0,sigma_alpha2,t,burnin,s
   alpha_sample=rep(0,t)
   delta_sample=rep(0,t)
   sigma_nu2_sample=rep(0,t)
-  upd=0
+  trial=0
   rej=0
+  upd=0
+  rep=0
   for(ite in 1:(t+burnin)){
-    if(ite%%100==0)print(ite)
+    if(ite%%500==0)print(ite)
     
     for(i in 2:(n-1)){
-      #r=updateh(y[i],h[i],ln_h[i-1],ln_h[i+1],alpha,delta,sigma_nu2)
+      r=updateh(y[i],h[i],ln_h[i-1],ln_h[i+1],alpha,delta,sigma_nu2)
       #r=updateh_rw(y[i],h[i],ln_h[i-1],ln_h[i+1],alpha,delta,sigma_nu2,sd_rw)
-      r=updateh_rej(y[i],ln_h[i-1],ln_h[i+1],alpha,delta,sigma_nu2)
+      #r=updateh_rej(y[i],ln_h[i-1],ln_h[i+1],alpha,delta,sigma_nu2)
       h[i]=r$newh
-      rej=rej+r$reject
       upd=upd+1
+      rep=rep+r$rep
+      rej=rej+r$reject
+      trial=trial+r$trial
       ln_h[i]=log(h[i])
     }
     ln_h[1]=rnorm(1,mean=alpha+delta*ln_h[2],sd=sqrt(sigma_nu2))
@@ -119,5 +130,5 @@ sampler=function(y,nu_0,s_0,delta_0,sigma_delta2,alpha_0,sigma_alpha2,t,burnin,s
     h_sample[,ite-burnin]=h
   }
   }
-  return=list(h_sample=h_sample,alpha_sample=alpha_sample,delta_sample=delta_sample,sigma_nu2_sample=sigma_nu2_sample,rejectionrate=rej/upd)
+  return=list(h_sample=h_sample,alpha_sample=alpha_sample,delta_sample=delta_sample,sigma_nu2_sample=sigma_nu2_sample,rejectionrate=rej/trial,repeatrate=rep/upd)
 }

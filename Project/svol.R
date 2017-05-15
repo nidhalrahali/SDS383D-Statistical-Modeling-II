@@ -1,12 +1,10 @@
 library(stats)
+library(fGarch)
 source('~/GitHub/SDS383D-course-work/Project/functions.R')
 
-x=-106
-sigma2=0.001
-mu=1
-#y=0.1
-#sigma2=0.1
-#mu=1
+x=0.01
+sigma2=0.05
+mu=-3
 h=seq(from=1,to=10,by=0.01)
 s=(1-2*exp(sigma2))/(1-exp(sigma2))+0.5
 r=(s-1)*exp(mu+sigma2/2)+x^2/2
@@ -19,31 +17,41 @@ lines(1.2*c*dinvgamma(h,shape=s,scale=r)~h,col="green")
 legend(x=6.8,y=0.25,legend=c("p","c=1","c=1.1","c=1.2"),fill=c("black","blue","red","green"))
 
 
-sp <- read.csv("~/GitHub/SDS383D-course-work/Project/SP1980-1987.csv")
-ix<-read.csv("~/GitHub/SDS383D-course-work/Project/IXIC2007-2010.csv")
-plot(ix$Close,type="l")
-ar1=ar.ols(x=sp$Close,order.max=1)
-lines(ar1$ar[1,1,1]*(sp$S.P.500-ar1$x.mean)+ar1$x.mean,col="red")
-y=ar1$resid
-y=na.omit(y)
-plot(y,type='l')
+sp <- read.csv("~/GitHub/SDS383D-course-work/Project/N225.csv")
+n=length(sp$Close)
+logchange=log(sp$Close[2:n])-log(sp$Close[1:(n-1)])
+plot(logchange,type='l',xlab='',ylab='log of price')
 
-n=length(ix$Close)
-logchange=log(ix$Close[2:n])-log(ix$Close[1:(n-1)])
-plot(4000*logchange,type='l')
-
-
-y1=(sp$Close[2:n]-sp$Close[1:(n-1)])/sp$Close[1:(n-1)]
-plot(y1,type='l')
-
-sample=sampler(logchange,1,1,0,10,0,10,2000,1000,0.1)
+proc.time()
+sample=sampler(logchange,1,1,0,10,0,10,8000,4000,0.3)
+proc.time()
 plot(sample$delta_sample,type='l',ylab="",main="delta")
-hist(sample$delta_sample,xlab='delta',ylab="",main="delta")
+hist(sample$delta_sample,xlab='',ylab="",breaks=20,main="histogram of delta")
 plot(sample$alpha_sample,type='l',ylab="",main="alpha")
-hist(sample$alpha_sample,xlab='alpha',ylab="",main="alpha")
+hist(sample$alpha_sample,xlab='',ylab="",breaks=20,main="histogram of alpha")
 plot(sample$sigma_nu2_sample,type='l',ylab="",main="sigma_nu2")
-hist(sample$sigma_nu2_sample,ylab="",main="sigma_nu2")
-plot(log(sample$h_sample[10,]),type='l',ylab="log(h)",main="evolution of h")
+hist(sample$sigma_nu2_sample,xlab='',ylab="",main="histogram of sigma_nu^2")
+plot(log(sample$h_sample[100,]),type='l',ylab="log(h)",xlab="iteration",main="evolution of h")
 sample$rejectionrate
 logmean=log(rowMeans(sample$h_sample))
 plot(logmean[2:(n-10)],type='l',ylab="log(h)",main="log of posterior mean of h")
+
+dat=hmrw3
+a=dat$alpha_sample
+d=dat$delta_sample
+s=dat$sigma_nu2_sample
+h=dat$h_sample
+logmean=log(rowMeans(h))
+plot(logmean,type='l',ylab="log(h)",main="log of posterior mean of h")
+
+hist(d,xlab='',ylab="",breaks=20,main="histogram of delta")
+hist(a,xlab='',ylab="",breaks=20,main="histogram of alpha")
+hist(s,xlab='',ylab="",breaks=20,main="histogram of sigma_nu^2")
+cov(a,d)
+cov(a,s)
+cov(s,d)
+acf(a,lag.max=8000,main="correlagram of alpha")
+acf(d,lag.max=8000,main="correlagram of delta")
+acf(s,lag.max=8000,main="correlagram of sigma_nu^2")
+
+gm=garchFit(data=logchange)
