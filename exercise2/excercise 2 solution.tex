@@ -1,0 +1,136 @@
+\documentclass{article}
+\usepackage{enumerate}
+\begin{document}
+\section{A simple Gaussian location model}
+\begin{enumerate}[(A)]
+\item
+This is equivalent with determine the distribution $x$ under a gaussian distribution with precision $\omega$ and mean $\mu$ where $\omega\sim Gamma(\frac{d}{2},\frac{\eta}{2\kappa})$, the result should be
+\begin{eqnarray}
+p(\theta)\sim(1+\frac{\kappa(\theta-\mu)^2}{\eta})^{-\frac{d+1}{2}}
+\end{eqnarray}
+Compare to the problem we have $\nu=d$, $s^2=\frac{\eta}{d\kappa}$ and $m=\mu$
+\item
+\begin{eqnarray}
+p(\theta,\omega|\vec{y})&=&\frac{p(\vec{y}|\theta,\omega)p(\theta,\omega)}{\int p(\vec{y}|\theta^\prime,\omega^\prime)p(\theta^\prime,\omega^\prime)d\theta^\prime d\omega^\prime}\nonumber\\
+&\propto&\omega^{\frac{n}{2}}e^{-\frac{\omega\sum_i(y_i-\theta)^2}{2}}\omega^{\frac{d+1}{2}-1}e^{-\omega\frac{\kappa(\theta-\mu)^2}{2}}e^{-\omega\frac{\eta}{2}}\nonumber\\
+&\propto&\omega^{\frac{d+n+1}{2}-1}e^{-\frac{\omega(n+\kappa)(\theta-\frac{\mu\kappa+\sum_iy_i}{n+\kappa})^2}{2}}e^{-\frac{\omega(\eta+\sum_iy_i^2+\kappa\mu^2-\frac{(\mu\kappa+\sum_iy_i)^2}{n+\kappa})}{2}}
+\end{eqnarray}
+After rearanging parameters
+\begin{eqnarray}
+\mu^*&=&\frac{\mu\kappa+\sum_iy_i}{n+\kappa}\\
+\kappa^*&=&\kappa+n\\
+d^*&=&d+n\\
+\eta^*&=&\eta+\sum_iy_i^2+\kappa\mu^2-\frac{(\mu\kappa+\sum_iy_i)^2}{n+\kappa}
+\end{eqnarray}
+The distribution is of the same form as $p(\theta,\omega)$
+\begin{eqnarray}
+p(\theta,\omega|\vec{y})&\propto&\omega^{\frac{d^*+1}{2}-1}e^{-\frac{\omega\kappa^*(\theta-\mu^*)^2}{2}}e^{-\frac{\omega\eta^*}{2}}
+\end{eqnarray}
+\item
+Keeping only the part dependent on $\theta$
+\begin{eqnarray}
+p(\theta|\vec{y},\omega)&=&\frac{p(\vec{y},\theta,\omega)}{p(\vec{y},\omega)}\nonumber\\
+&\propto&e^{-\frac{\omega\kappa^*(\theta-\mu^*)^2}{2}}\sim N(\mu^*,(\omega\kappa^*)^{-1})
+\end{eqnarray}
+\item
+\begin{eqnarray}
+p(\omega|\vec{y})&=&\frac{p(\omega,\vec{y})}{p(\vec{y})}\nonumber\\
+&\propto&\int p(\omega,\vec{y},\theta^\prime)d\theta^\prime\nonumber\\
+&\propto&\omega^{\frac{d^*+1}{2}-1}e^{-\frac{\omega\eta^*}{2}}\int e^{-\frac{\omega\kappa^*(\theta^\prime-\mu^*)^2}{2}}d\theta^\prime\nonumber\\
+&\propto&\omega^{\frac{d^*}{2}-1}e^{-\frac{\omega\eta^*}{2}}\sim\Gamma(\frac{d^*}{2},\frac{\eta^*}{2})
+\end{eqnarray}
+\item
+\begin{eqnarray}
+p(\theta|\vec{y})=\int p(\theta,\omega^\prime|\vec{y})d\omega^\prime\nonumber\\
+\end{eqnarray}
+Since $p(\theta,\omega|\vec{y})$ is same to $p(\theta,\omega)$ up to a parameter redefinition. So the result should be same to part A with parameter redefinition.
+\begin{equation}
+p(\theta|\vec{y})\sim(1+\frac{\kappa^*(\theta-\mu^*)^2}{\eta^*})^{-\frac{d^*+1}{2}}
+\end{equation}
+\item
+False. In the limit $\kappa$, $d$ and $\eta$ goes to zero
+\begin{eqnarray}
+p(\theta)\propto\frac{1}{\sqrt{1+\theta^2}}
+\end{eqnarray}
+When $\theta\rightarrow\infty$, $p(\theta)\rightarrow\frac{1}{\theta}$ which cannot be normalized.
+\item
+True. The starred paramters are still in healthy condition under this limit.
+\item
+
+\end{enumerate}
+\section{The conjugate Gaussian linear model}
+\subsection{Basics}
+\begin{enumerate}[(A)]
+\item
+\begin{eqnarray}
+p(\vec{\beta}|\vec{y},\omega)&=&\frac{p(\vec{\beta},\vec{y},\omega)}{p(\vec{y},\omega)}\nonumber\\
+&\propto&p(\vec{y}|\vec{\beta},\omega)p(\vec{\beta}|\omega)\nonumber\\
+&\propto&e^{-\frac{\omega(\vec{y}-X\vec{\beta})^T\Lambda(\vec{y}-X\vec{\beta})}{2}}e^{-\frac{\omega(\vec{\beta}-\vec{m})^TK(\vec{\beta}-\vec{m})}{2}}\nonumber\\
+&\propto&e^{-\frac{\omega(\vec{\beta}-\vec{m}^*)^TK^*(\vec{\beta}-\vec{m}^*)}{2}}\\
+K^*&=&X^T\Lambda X+K\\
+\vec{m}^*&=&K^{*-1}(X^T\Lambda\vec{y}+K\vec{m})
+\end{eqnarray}
+\item
+\begin{eqnarray}
+p(\omega|\vec{y})&\propto&p(\omega,\vec{y})\nonumber\\
+&\propto&\int p(\vec{y}|\vec{\beta}^\prime,\omega)p(\vec{\beta}^\prime|\omega)p(\omega)d\vec{\beta}^\prime\nonumber\\
+&\propto&\omega^{\frac{d^*+1}{2}-1}e^{-\frac{\omega\eta^*}{2}}\int e^{-\frac{\omega(\vec{\beta}^\prime-\vec{m}^*)^TK^*(\vec{\beta}^\prime-\vec{m}^*)}{2}}d\vec{\beta}^\prime\nonumber\\
+&\propto&\omega^{\frac{d^*}{2}-1}e^{-\frac{\omega\eta^*}{2}}\sim\Gamma(\frac{d^*}{2},\frac{\eta^*}{2})\\
+d^*&=&d+n\\
+\eta^*&=&\eta+\vec{y}^T\Lambda\vec{y}+\vec{m}^TK\vec{m}-\vec{m}^{*T}K^*\vec{m}^*
+\end{eqnarray}
+\item
+Similar to previous problems
+\begin{eqnarray}
+p(\omega,\vec{\beta}|\vec{y})\propto\omega^{\frac{d^*+1}{2}-1}e^{-\frac{\omega\eta^*}{2}}e^{-\frac{\omega(\vec{\beta}-\vec{m}^*)^TK^*(\vec{\beta}-\vec{m}^*)}{2}}
+\end{eqnarray}
+Again, reuse the derivation where we derive t-distribution from normal/gamma prior
+\begin{eqnarray}
+p(\vec{\beta}|\vec{y})&=&\int p(\omega^\prime,\vec{\beta}|\vec{y})d\omega^\prime\nonumber\\
+&\propto&(1+\frac{(\vec{\beta}-\vec{m}^*)^TK^*(\vec{\beta}-\vec{m}^*)}{\eta^*})^{-\frac{d^*+1}{2}}
+\end{eqnarray}
+
+\item
+The script "gdpgrowth.R" read data from "gdpgrowth.csv" and use the above linear model to fit the relation between column GR6096 and DEF60, using
+\begin{eqnarray}
+\vec{\beta}_{\textrm{estimate}}=\vec{m}^*=K^{*-1}X^T\Lambda\vec{y}
+\end{eqnarray} 
+\end{enumerate}
+
+\subsection{A heavy tailed error model}
+\begin{enumerate}[(A)]
+\item
+
+Let $\vec{\alpha}=X\vec{\beta}$
+
+\begin{eqnarray}
+p(\vec{y}|X,\vec{\beta},\omega)&=&\int p(\vec{y}|X,\vec{\beta},\omega\Lambda)\prod_ip(\lambda_i)d\lambda_i\nonumber\\
+&\propto&\prod_i\lambda_i^{\frac{1}{2}}e^{-\frac{\omega\lambda_i(y_i-\alpha_i)^2}{2}}p(\lambda_i)d\lambda_i
+\end{eqnarray}
+This is the familiar normal/gamma prior, the result should be
+\begin{eqnarray}
+p(\vec{y}|X,\vec{\beta},\omega)\propto\prod_i(1+\frac{\lambda_i(y_i-\alpha_i)^2}{h})^{-\frac{h+1}{2}}
+\end{eqnarray}
+
+\item
+\begin{eqnarray}
+p(\lambda_i|\vec{y},\vec{\beta},\omega)&\propto&p(\vec{y}|\vec{\beta},\omega,\Lambda)p(\lambda_i)\nonumber\\
+&\propto&e^{-\lambda_i(\frac{h+\omega(y_i-\alpha_i)^2}{2})}\lambda_i^{\frac{h+1}{2}-1}\nonumber\\
+&\sim&\Gamma(\frac{h+1}{2},\frac{h+\omega(y_i-\alpha_i)^2}{2})
+\end{eqnarray}
+
+
+\item
+See script "MCMC on gdpgrowth.R" and "gibbssampler.R". We generate the cycle
+\begin{equation}
+(\vec{\beta}_1|\vec{y},\omega_0,\Lambda_0),(\omega_1|\vec{y},\Lambda_0)\rightarrow (\Lambda_1|\vec{y},\vec{\beta}_1,\omega_1)\rightarrow (\vec{\beta}_2|\vec{y},\omega_1,\Lambda_1),(\omega_2|\vec{y},\Lambda_1)\rightarrow\cdots
+\end{equation}
+where
+\begin{eqnarray}
+(\vec{\beta}|\vec{y},\omega,\Lambda)&\sim&N(\vec{m}^*(\Lambda,\vec{y}),\omega K^*(\Lambda))\nonumber\\
+(\omega|\vec{y},\Lambda)&\sim&\Gamma(\frac{d^*}{2},\frac{\eta^*(\Lambda,\vec{y})}{2})\nonumber\\
+(\lambda_i|\vec{y},\vec{\beta},\omega)&\sim&\Gamma(\frac{h}{2},\frac{h+\omega(y_i-\alpha_i)^2}{2})
+\end{eqnarray}
+\end{enumerate}
+
+\end{document}

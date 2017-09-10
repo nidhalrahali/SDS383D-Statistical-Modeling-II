@@ -1,0 +1,404 @@
+\documentclass{article}
+\usepackage{enumerate}
+\title{Excercise 1}
+\author{Yinan Zhu}
+\date{}
+\begin{document}
+\maketitle
+\section{Bayesian inference in simple conjugated families}
+\begin{enumerate}[(A)]
+
+\item
+
+\begin{eqnarray}
+p(\omega|\vec{x})=\frac{p(\vec{x}|\omega)p(\omega)}{\int_{\Omega}p(\vec{x}|\alpha)p(\alpha)d\alpha}
+\end{eqnarray}
+For Bernoulli sampling model, the distribution of $\vec{x}$ given $\omega$ is
+\begin{eqnarray}
+p(\vec{x}|\omega)=\prod_ip(x_i|\omega)=\omega^p(1-\omega)^q
+\end{eqnarray}
+$p$ and $q$ are the number of two outcomes observed among all samples respectively. Of course $p+q=N$.
+\begin{eqnarray}
+p(\omega|\vec{x})&=&\frac{\omega^{p+a-1}(1-\omega)^{N-q+b-1}}{\int_{\Omega}\alpha^{p+a-1}(1-\alpha)^{N-p+b-1}d\alpha}\nonumber\\
+&=&\frac{\Gamma(N+a+b)}{\Gamma(p+a)\Gamma(N-p+b)}\omega^{p+a-1}(1-\omega)^{N-p+b-1}
+\end{eqnarray}
+
+\item
+
+The PDF of the sum of two independent random variables is the convolution of their PDF.
+\begin{eqnarray}
+p(Y_2=y)&=&\int p(X_1=y-x)p(X_2=x)dx\nonumber\\
+&=&\frac{e^{-y}}{\Gamma(a_1)\Gamma(a_2)}\int_{x<y} x^{a_2-1}(y-x)^{a_1-1}dx\nonumber\\
+&=&\frac{y^{a_1+a_2-1}e^{-y}}{\Gamma(a_1)\Gamma(a_2)}\int_{x<y}  (\frac{x}{y})^{a_2-1}(1-\frac{x}{y})^{a_1-1}d(\frac{x}{y})\nonumber\\
+&=&\frac{1}{\Gamma(a_1+a_2)}y^{a_1+a_2-1}e^{-y}
+\end{eqnarray}
+Or directly use the property: the sum of independent gamma distributions $\sum Ga(a_i,b)$ is equivalent to $Ga(\sum a_i,b)$
+
+The transformation can be written as
+\begin{eqnarray}
+X_1&=&Y_1Y_2\nonumber\\
+X_2&=&Y_2-Y_1Y_2
+\end{eqnarray}
+Jaccobian is
+\begin{eqnarray}
+J(X_1 X_2|Y_1 Y_2)=\left|
+\begin{array}{cc}
+\frac{\partial X_1}{\partial Y_1} & \frac{\partial X_1}{\partial Y_2}  \\
+\frac{\partial X_2}{\partial Y_1} & \frac{\partial X_2}{\partial Y_2} 
+\end{array} \right|=|Y_2|
+\end{eqnarray}
+\begin{eqnarray}
+p(Y_1=y)&=&\int p(X_1=xy)p(X_2=x-xy)|x|dx\nonumber\\
+&=&\frac{y^{a_1-1}(1-y)^{a_2-1}}{\Gamma(a_1)\Gamma(a_2)}\int x^{a_1+a_2-1}e^{-x}dx\nonumber\\
+&=&\frac{\Gamma(a_1+a_2)y^{a_1-1}(1-y)^{a_2-1}}{\Gamma(a_1)\Gamma(a_2)}
+\end{eqnarray}
+We can simlate $Beta(a_1,a_2)$ by making $X_1=Ga(a_1,1)$ and $X_2=Ga(a_2,1)$ and then compute $X_1/(X_1+X_2)$ for each data point generated.
+
+\item
+
+\begin{eqnarray}
+p(\theta|\vec{x})=\frac{p(\vec{x}|\theta)p(\theta)}{\int_{\Omega}p(\vec{x}|\alpha)p(\alpha)d\alpha}
+\end{eqnarray}
+\begin{eqnarray}
+p(\vec{x}|\theta)=\prod_ip(x_i|\theta)=\textrm{Constant}\times e^{-\frac{\sum_i(x_i-\theta)^2}{2\sigma^2}}
+\end{eqnarray}
+\begin{eqnarray}
+p(\omega|\vec{x})&=&\frac{e^{-\frac{\sum_i(x_i-\theta)^2}{2\sigma^2}-\frac{(\theta-m)^2}{2v^2}}}{\int_{\Omega} e^{-\frac{\sum_i(x_i-\alpha)^2}{2\sigma^2}-\frac{(\alpha-m)^2}{2v^2}}d\alpha}\nonumber\\
+&=&\frac{1}{\sqrt{2V^2\pi}}e^{-\frac{(\omega-M)^2}{2V^2}}\\
+V^2&=&\frac{\sigma^2v^2}{\sigma^2+Nv^2}\\
+M&=&\frac{v^2\sum_ix_i+\sigma^2m}{\sigma^2+Nv^2}
+\end{eqnarray}
+The resut is another Gaussian distribution
+
+\item
+
+\begin{eqnarray}
+p(\omega|\vec{x})&=&\frac{p(\vec{x}|\omega)p(\omega)}{\int_{\Omega}p(\vec{x}|\alpha)p(\alpha)d\alpha}\nonumber\\
+&=&\frac{e^{-(\frac{\sum_i(x_i-\theta)^2}{2}+b)\omega}\omega^{a+\frac{N}{2}-1}}{\int e^{-(\frac{\sum_i(x_i-\theta)^2}{2}+b)\alpha}\alpha^{a+\frac{N}{2}-1}d\alpha}\nonumber\\
+&=&\frac{(\frac{\sum_i(x_i-\theta)^2}{2}+b)^{a+\frac{N}{2}}}{\Gamma(a+\frac{N}{2})}e^{-(\frac{\sum_i(x_i-\theta)^2}{2}+b)\omega}\omega^{a+\frac{N}{2}-1}
+\end{eqnarray}
+Transform back to the distribution of $\frac{1}{\omega}$, using the fact that $\sigma^2=\frac{1}{\omega}$ is strictly positive and monotonous, it can be shown that their pdf has relation
+\begin{eqnarray}
+p(\sigma^2)=\frac{1}{\sigma^4}p(\omega)|_{\omega=\frac{1}{\sigma^2}}
+\end{eqnarray}
+so we have
+\begin{eqnarray}
+p(\sigma^2|\vec{x})=\frac{(\frac{\sum_i(x_i-\theta)^2}{2}+b)^{a+\frac{N}{2}}}{\Gamma(a+\frac{N}{2})}\frac{e^{-(\frac{\sum_i(x_i-\theta)^2}{2}+b)\frac{1}{\sigma^2}}}{\sigma^{2a+N+2}}
+\end{eqnarray}
+
+\item
+
+\begin{eqnarray}
+p(\omega|\vec{x})&=&\frac{p(\vec{x}|\omega)p(\omega)}{\int_{\Omega}p(\vec{x}|\alpha)p(\alpha)d\alpha}\nonumber\\
+&=&\frac{e^{-\sum_i\frac{(x_i-\theta)^2}{2\sigma_i^2}-\frac{(\theta-m)^2}{2v^2}}}{\int_{\Omega} e^{-\sum_i\frac{(x_i-\alpha)^2}{2\sigma_i^2}-\frac{(\alpha-m)^2}{2v^2}}d\alpha}\nonumber\\
+&=&\frac{1}{\sqrt{2V^2\pi}}e^{-\frac{(\omega-M)^2}{2V^2}}\\
+\frac{1}{V^2}&=&\frac{1}{v^2}+\sum_i\frac{1}{\sigma_i^2}\\
+M&=&\frac{\sum_i\frac{x_i}{\sigma_i^2}+\frac{m}{v^2}}{\frac{1}{v^2}+\sum_i\frac{1}{\sigma_i^2}}
+\end{eqnarray}
+
+\item
+
+Compute the distribution of $\sigma^2$ from that of $\frac{1}{\sigma^2}$
+\begin{eqnarray}
+p(\sigma^2=\omega^2)=\frac{1}{\omega^4}p(\frac{1}{\sigma^2}=\frac{1}{\omega^2})=\frac{b^a\omega^{-2a-2}e^{-\frac{b}{\omega^2}}}{\Gamma(a)}
+\end{eqnarray}
+
+\begin{eqnarray}
+p(x)&=&\int p(x|\sigma^2=\omega^2)p(\sigma^2=\omega^2)d\omega^2\nonumber\\
+&=&\frac{b^a}{\sqrt{2\pi}\Gamma(a)}\int_0^{\infty} \omega^{-2a-3}e^{-\frac{b}{\omega^2}-\frac{x^2}{2\omega^2}}d\omega^2
+\end{eqnarray}
+doing transformation $d\omega^2=-\mu^{-2}d\mu$ where $\mu=\frac{1}{\omega^2}$. Also use Gamma integral:
+\begin{eqnarray}
+p(x)&=&-\frac{b^a}{\sqrt{2\pi}\Gamma(a)}\int_{\infty}^0\mu^{a-\frac{1}{2}}e^{-(b+\frac{x^2}{2})\mu}d\mu\nonumber\\
+&=&\frac{\Gamma(a+\frac{1}{2})}{\sqrt{2b\pi}\Gamma(a)}(1+\frac{x^2}{2b})^{-\frac{1}{2}-a}
+\end{eqnarray}
+This is Student's t-distribution.
+
+\end{enumerate}
+
+\section{The multivariate normal distribution}
+\subsection{Basics}
+\begin{enumerate}[(A)]
+
+\item
+
+The expectation value is linear. If $x$ and $y$ are random variables and $a$ and $b$ are constants:
+\begin{eqnarray}
+E(ax+by)=aE(x)+bE(y)
+\end{eqnarray}
+This can be generaized for matrix coefficients and random variables
+\begin{eqnarray}
+(E(AX))_{ij}=E(\sum_k A_{ik}X_{kj})=\sum_kA_{ik}E(X_{kj})=(AE(X))_{ij}
+\end{eqnarray}
+\begin{eqnarray}
+E((\vec{x}-\vec{\mu})(\vec{x}-\vec{\mu})^T)=E(\vec{x}\vec{x}^T)-\vec{\mu}E(\vec{x}^T)-E(\vec{x})\vec{\mu}^T+\vec{\mu}\vec{\mu}^T=E(\vec{x}\vec{x}^T)-\vec{\mu}\vec{\mu}^T
+\end{eqnarray}
+\begin{eqnarray}
+Cov(A\vec{x})&=&E(A\vec{x}\vec{x}^TA^T)-AE(\vec{x})E(\vec{x})^TA^T\nonumber\\
+&=&AE(\vec{x}\vec{x}^T)A^T-AE(\vec{x})E(\vec{x})^TA^T=ACov(\vec{x})A^T
+\end{eqnarray}
+Adding $b$ will not change the result as it is cancelled in $\vec{x}-\vec{\mu}$, so we have
+\begin{eqnarray}
+Cov(A\vec{x}+b)=ACov(\vec{x})A^T
+\end{eqnarray}
+
+\item
+
+\begin{eqnarray}
+p(\vec{z})=\prod_ip(z_i)=\frac{1}{(2\pi)^{\frac{dim(\vec{z})}{2}}}e^{-\frac{|\vec{z}|^2}{2}}
+\end{eqnarray}
+\begin{eqnarray}
+M(\vec{x},\vec{t})=\prod_iM(x_i,t_i))=e^{\frac{|\vec{t}|^2}{2}}
+\end{eqnarray}
+
+\item
+
+If $\vec{x}\sim N(\mu,\Sigma)$, since $\vec{a}^T\vec{x}\sim N(\vec{a}^T\vec{\mu},\vec{a}^T\Sigma\vec{a})$, its moment generating function evaluated at $t=1$ is
+\begin{equation}
+E(e^{\vec{a}^T\vec{x}})=e^{\vec{a}^T\vec{\mu}+\frac{\vec{a}^T\Sigma\vec{a}}{2}}
+\end{equation}
+this is the moment generating function of $\vec{x}$ evaluated at $\vec{t}=\vec{a}$. It is the same as the form we want.
+
+If $x$ has the proposed moment generating function, we can evaluate it at $\vec{t}=\vec{a}$ for any nonzero $\vec{a}$. It will be a moment generating function of $\vec{a}^T\vec{x}$ at $t=1$. Easy to see it is of the form of a moment generating function from Gaussian distribution.
+\item
+
+\begin{eqnarray}
+E(e^{t^TLz+t^T\mu})&=&e^{t^T\mu}E(e^{(L^Tt)^Tz})\nonumber\\
+&=&e^{t^T\mu+\frac{(L^Tt)^T(L^Tt)}{2}}\nonumber\\
+&=&e^{t^T\mu+\frac{t^T(LL^T)t}{2}}
+\end{eqnarray}
+
+From (A) $LL^T$ is the covariance matrix of $Lz+\mu$. From (C) this proves $Lz+\mu$ is multivariate normal.
+
+\item
+
+Because covariance matrix is symmetric and positive semi-definite, it can be written as $\Sigma=L^TDL$, where $D$ is diagonal with every entry nonegative and and $L$ is orthogonal. 
+
+Define $y=D^{-\frac{1}{2}}L(x-\mu)$. Using similar derivation as in last question.
+
+\begin{eqnarray}
+E(e^{t^Ty})&=&E(e^{t^TD^{-\frac{1}{2}}Lx-t^TD^{-\frac{1}{2}}\mu})\nonumber\\
+&=&E(e^{t^TD^{-\frac{1}{2}}Lx})\nonumber\\
+&=&e^{\frac{t^T(D^{-1}L\Sigma L^T)t}{2}}=e^{\frac{t^T(DD^{-1})t}{2}}
+\end{eqnarray}
+($D^{-1}$ is not the inverse of $D$).$y$ is a collection of independent standard normal distribution and zeros. $x=L^TD^{\frac{1}{2}}y+\mu$ is the desired transformation. To simulate a multivariate Gaussian. Diagonalize its covariance matrix and simulate univariate Gaussian whose mean is zero and standard deviation being diagonal entries of $D$. Then perform the transformation.
+
+\item
+
+There exists an array of independent normal distribution with mean 0 which can be transformed to $x$ after an affine transformation. They have PDF:
+\begin{eqnarray}
+f(\vec{x})=\frac{1}{(2\pi)^\frac{dim(x)}{2}\prod_i\sigma_i}e^{-\sum_i\frac{z_i^2}{2\sigma_i^2}}
+\end{eqnarray}
+
+Let $L$ be the rotation in the affine transformation. From previous question we have $\Sigma=LDL^T$  where $L=diag(\sigma_1^2,\sigma_2^2,\cdots)$ and $\det(\Sigma)=\prod_i\sigma_i$. Set $y=Lz$, we have
+\begin{eqnarray}
+f(\vec{y})=|L|f(L\vec{z})=\frac{1}{\sqrt{\det(2\pi\Sigma)}}e^{-\frac{y^T\Sigma^{-1}y}{2}}
+\end{eqnarray}
+
+This is a quadratic form of $y=x-\mu$.
+
+\item
+
+Compute the moment generating function, using the fact that $x_1$ and $x_2$ are independent
+\begin{eqnarray}
+E(e^{t^T(Ax_1+Bx_2)}&=&e^{t^TA\mu_1+\frac{t^TA^T\Sigma_1 At}{2}}e^{t^TB\mu_2+\frac{t^TB^T\Sigma_2Bt}{2}}\nonumber\\
+&=&e^{t^T(A\mu_1+B\mu_2)+\frac{t^T(A^T\Sigma_1 A+B^T\Sigma_2B)}{2}}
+\end{eqnarray}
+
+\end{enumerate}
+\subsection{Conditionals and marginals}
+\begin{enumerate}[(A)]
+\item
+
+$\vec{x}_1=A\vec{x}$ where
+\begin{eqnarray}
+A= \left( \begin{array}{cc}
+I & 0   \\
+0 & 0   \end{array} \right)
+\end{eqnarray}
+
+\begin{eqnarray}
+f(\vec{x}_1)&=&\frac{1}{\sqrt{\det(2\pi A\Sigma A^T)}}e^{-\frac{(\vec{x}_1-\vec{\mu}_1)^T(A\Sigma A^T)^{-1}(\vec{x}_1-\vec{\mu}_1)}{2}}\nonumber\\
+&=&\frac{1}{\sqrt{\det(2\pi\Sigma_{11})}}e^{-\frac{(\vec{x}_1-\vec{\mu}_1)^T\Sigma_{11}^{-1}(\vec{x}_1-\vec{\mu}_1)}{2}}
+\end{eqnarray}
+
+\item
+
+\begin{eqnarray}
+\Omega_{11}&=&(\Sigma_{11}-\Sigma_{12}\Sigma_{22}^{-1}\Sigma_{12}^T)^{-1}\\
+\Omega_{12}&=&-\Sigma_{11}^{-1}\Sigma_{12}(\Sigma_{22}-\Sigma_{12}^T\Sigma_{11}^{-1}\Sigma_{12})^{-1}\nonumber\\
+&=&-\Sigma_{11}^{-1}\Sigma_{12}\Omega_{22}\\
+\Omega_{21}^T=\Omega_{12}&=&-(\Sigma_{11}-\Sigma_{12}\Sigma_{22}^{-1}\Sigma_{12}^T)^{-1}\Sigma_{12}\Sigma_{11}^{-1}\nonumber\\
+&=&-\Omega_{11}\Sigma_{12}\Sigma_{11}^{-1}\\
+\Omega_{22}&=&(\Sigma_{22}-\Sigma_{12}^T\Sigma_{11}^{-1}\Sigma_{12})^{-1}
+\end{eqnarray}
+
+\item
+
+\begin{eqnarray}
+f(\vec{x}_1|\vec{x}_2)&=&f(\vec{x}_1,\vec{x}_2)/f(\vec{x}_2)\nonumber\\
+&\propto&e^{-\frac{(\vec{x}-\vec{\mu})^T\Sigma^{-1}(\vec{x}-\vec{\mu})-(\vec{x}_2-\vec{\mu}_2)^T\Sigma_{22}^{-1}(\vec{x}_2-\vec{\mu})}{2}}
+\end{eqnarray}
+
+Compute the arguments of exponentials, keeping only the $\vec{x}_1$ dependent parts:
+\begin{eqnarray}
+&&(\vec{x}-\vec{\mu})^T\Sigma^{-1}(\vec{x}-\vec{\mu})-(\vec{x}_2-\vec{\mu}_2)^T\Sigma_{22}^{-1}(\vec{x}_2-\vec{\mu})\nonumber\\
+&=&(\vec{x}_1^T-\vec{\mu}_1^T,\vec{x}_2^T-\vec{\mu}_2^T)\left( \begin{array}{cc}
+\Omega_{11} & \Omega_{12}   \\
+\Omega_{12}^T & \Omega_{22}   \end{array} \right)
+\left(\begin{array}{c}
+\vec{x}_1-\vec{\mu}_1 \\
+\vec{x}_2-\vec{\mu}_2 \end{array} \right)+\cdots\nonumber\\
+&=&((\vec{x}_1-\vec{\mu}_1)^T\Omega_{11}+(\vec{x}_2-\vec{\mu}_2)^T\Omega_{12}^T,(\vec{x}_1-\vec{\mu}_1)^T\Omega_{12}+(\vec{x}_2-\vec{\mu}_2)^T\Omega_{22})\nonumber\\
+&&\cdot\left(\begin{array}{c}
+\vec{x}_1-\vec{\mu}_1 \\
+\vec{x}_2-\vec{\mu}_2 \end{array} \right)+\cdots\nonumber\\
+&=&(\vec{x}_1-\vec{\mu}_1)^T\Omega_{11}(\vec{x}_1-\vec{\mu}_1)+2(\vec{x}_2-\vec{\mu}_2)^T\Omega_{12}^T(\vec{x}_1-\vec{\mu}_1)+\cdots\nonumber\\
+&=&((\vec{x}_1-\vec{\mu}_1)^T+(\vec{x}_2-\vec{\mu}_2)^T\Omega_{12}^T\Omega_{11}^{-1})\Omega_{11}(\vec{x}_1-\vec{\mu}_1+\Omega_{11}^{-1}\Omega_{12}(\vec{x}_2-\vec{\mu}_2))+\cdots\nonumber\\
+&=&((\vec{x}_1-\vec{\mu}_1)^T-(\vec{x}_2-\vec{\mu}_2)^T\Sigma_{11}^{-1}\Sigma_{12}^T)(\Sigma_{11}-\Sigma_{12}\Sigma_{22}^{-1}\Sigma_{12}^T)^{-1}(\vec{x}_1-\vec{\mu}_1-\Sigma_{12}\Sigma_{11}^{-1}(\vec{x}_2-\vec{\mu}_2))\nonumber\\
+&&+\cdots
+\end{eqnarray}
+
+So the functin $f(\vec{x_1}|\vec{x_2})$ peaks at values that makes $\vec{x}_1-\vec{\mu}_1-\Sigma_{12}\Sigma_{11}^{-1}(\vec{x}_2-\vec{\mu}_2)$ vanish. This gives $\vec{x}_1$ as a linear function of $\vec{x}_2$
+\end{enumerate}
+
+\section{Multiple regression: three classical principles for inference}
+\begin{enumerate}[(A)]
+\item
+Least squares: expand the target function, and differentiate against $\beta$
+\begin{eqnarray}
+\textrm{RSS}=\sum_i-2\vec{x}_i^T\vec{\beta}y_i+\vec{\beta}^T\vec{x}_i\vec{x}_i^T\vec{\beta}+\cdots
+\end{eqnarray}
+\begin{eqnarray}
+\frac{\partial\textrm{RSS}}{\partial\vec{\beta}}&=&\sum_i-2\vec{x}_iy_i+2\vec{x}_i\vec{x}_i^T\vec{\beta}\\
+\frac{\partial^2\textrm{RSS}}{\partial\vec{\beta}^2}&=&\sum_i2\vec{x}_i\vec{x}_i^T
+\end{eqnarray}
+The solution for minimization problem is all the $\beta$ satisfying
+\begin{equation}
+\vec{x}_iy_i=\vec{x}_i\vec{x}^T_i\vec{\beta}
+\end{equation}
+for all $i$. This can be written in the matrix form
+\begin{equation}
+X\vec{y}=XX^T\vec{\beta}
+\end{equation}
+
+Maximum likelihood: 
+\begin{eqnarray}
+\prod_i p(y_i|\vec{\beta},\sigma^2)\propto e^{-\frac{\textrm{SE}}{2\sigma^2}}
+\end{eqnarray}
+The maximization of this function is minimization of $SE$.
+
+Method of moments:
+\begin{eqnarray}
+\textrm{cov}(\epsilon,i)&=&\frac{1}{n-1}\sum_k(X_{ik}-\frac{1}{n}\sum_j X_{ij})(\epsilon_k-\bar{\epsilon})\nonumber\\
+&=&\frac{1}{n-1}((X\vec{\epsilon})_i-\bar{\epsilon}\sum_kX_{ik}-(\frac{1}{n}\sum_jX_{ij})\sum_k\epsilon_k+\bar{\epsilon}\sum_jX_{ij})\nonumber\\
+&=&\frac{1}{n-1}(\sum_kX_{ik}(\vec{\epsilon}_k-\bar{\epsilon})))
+\end{eqnarray}
+Plug in $\vec{\epsilon}=\vec{y}-X^T\vec{\beta}$. Suppose we just make the first term above zero:
+\begin{eqnarray}
+0=X\vec{\epsilon}=X(\vec{y}-\frac{1}{n}\sum_iy_i)-X(X^T\vec{\beta}-\frac{1}{n}\sum_i(X^T\vec{\beta})_i)
+\end{eqnarray}
+
+\item
+
+The estimater can be computed with the same formula in previous questin except we replace $y_i$ by $\sqrt{\omega_i}y_i$ and $X_{ij}$ by $\sqrt{\omega_i}X_{ij}$.
+
+Let $\sigma_i^2=\frac{1}{\omega_i}$, then the joint pdf of $\vec{y}$ becomes proportional to
+\begin{equation}
+e^{-\frac{\textrm{RSS}}{2}}
+\end{equation}
+
+\end{enumerate}
+\section{Quantifying uncertainty: some basic frequentist ideas}
+\subsection{In linear regression}
+\begin{enumerate}[(A)]
+\item
+\begin{eqnarray}
+\vec{\beta}_{\textrm{estimate}}=(XX^T)^{-1}X\vec{y}=(XX^T)^{-1}X(X^T\vec{\beta}+\vec{\epsilon})=\vec{\beta}+(XX^T)^{-1}X\vec{\epsilon}
+\end{eqnarray}
+Therefore, $\vec{\beta}_{\textrm{estimate}}\sim N(\vec{\beta},\sigma^2(XX^T)^{-1})$
+\item
+Let $H=X^T(XX^T)^{-1}X$, then we have $H^T=H$, $\vec{y}_{\textrm{estimate}}=H\vec{y}$ and also $(1-H)^2=(1-H)$
+\begin{eqnarray}
+&&E(|\vec{y}_{\textrm{estimate}}-\vec{y}|^2)\nonumber\\
+&=&E(\vec{y}^T(1-H)\vec{y})\nonumber\\
+&=&E(\textrm{Tr}(\vec{y}^T(1-H)\vec{y}))\nonumber\\
+&=&E(\textrm{Tr}((1-H)\vec{y}\vec{y}^T))\nonumber\\
+&=&\textrm{Tr}((1-H)E(\vec{y}\vec{y}^T))\nonumber\\
+&=&\textrm{Tr}(1-H)\sigma^2\nonumber\\
+&=&(n-p)\sigma^2
+\end{eqnarray}
+Therefore $\sigma^2=\frac{\textrm{RSS}}{n-p}$ and we can estimate $\sigma^2$ by computing the RSS of given data.
+
+The script ozone.R computes the covariance matrix on a dataset using this method and compare it to the built-in function "lm".
+\end{enumerate}
+\subsection{Propagating uncertainty}
+\begin{enumerate}
+\item
+\begin{eqnarray}
+&&E((\theta_1+\theta_2-\bar{\theta_1}-\bar{\theta_2})^2)\nonumber\\
+&=&E((\theta_1+\theta_2)^2)-(\bar{\theta_1}+\bar{\theta_2})^2\nonumber\\
+&=&E(\theta_1^2)-\bar{\theta_1}^2+E(\theta_2^2)-\bar{\theta_2}^2+2(E(\theta_1\theta_2)-\bar{\theta_1}\bar{\theta_2})\nonumber\\
+&=&\sigma_{11}^2+\sigma_{22}^2+2\sigma_{12}^2
+\end{eqnarray}
+
+For $f=\sum_i\theta_i$
+\begin{eqnarray}
+\sigma_f^2=\sum_{ij}\sigma_{ij}
+\end{eqnarray}
+\item
+Suppose $f$ takes value at $\vec{\theta}=0$ and we expand it around this point.
+\begin{eqnarray}
+f=f(0)+\sum_i\theta_i\frac{\partial f(0)}{\partial\theta_i}+O(\theta^2\frac{\partial^2f(0)}{\partial\theta^2})
+\end{eqnarray}
+\begin{eqnarray}
+E((f-E(f))^2)&=&E((\sum_i\theta_i\frac{\partial f(0)}{\partial\theta_i}-\sum_i\frac{\partial f(0)}{\partial\theta_i}E(\theta_i))^2)\nonumber\\
+&=&\sum_{ij}\frac{\partial f}{\partial\theta_i}\frac{\partial f}{\partial\theta_j}\sigma_{ij}^2
+\end{eqnarray}
+\end{enumerate}
+\section{Bootstrapping}
+\begin{enumerate}[(A)]
+\item
+See ozonebootstrap.R
+
+\item
+See multi-normal bootstrap.R
+
+Derivation of MLE for multivariate normal distribution: The estimated value should maximize the function:
+\begin{eqnarray}
+L(\vec{\mu},\Sigma)&=&\log f(\vec{x}|\vec{\mu},\Sigma)\nonumber\\
+&=&-\frac{1}{2}(-n\log|\Sigma^{-1}|+\sum_i(x_i-\vec{\mu})^T\Sigma^{-1}(x_i-\vec{\mu}))
+\end{eqnarray}
+
+Take derivative with $\vec{\mu}$ and $\Sigma^{-1}$, using $\frac{\partial\log|A|}{\partial A}=(A^{-1})^T$, $\frac{\partial\textrm{Tr}(AB)}{\partial A}=B^T$
+\begin{eqnarray}
+\frac{\partial L}{\partial\vec{\mu}}&=&-\Sigma^{-1}(n\vec{\mu}-\sum_ix_i)\\
+\frac{\partial L}{\partial\Sigma^{-1}}&=&-\frac{1}{2}(-n\Sigma^T+\frac{\partial\textrm{Tr}(\Sigma^{-1}\sum_i(x_i-\vec{\mu})(x_i-\vec{\mu})^T)}{\partial\Sigma^{-1}})\nonumber\\
+&=&-\frac{1}{2}(-n\Sigma^T+(x-\mu)^T(x-\mu))
+\end{eqnarray}
+So we have
+\begin{eqnarray}
+\vec{\mu}_{\textrm{estimate}}&=&\frac{1}{n}\sum_ix_i\\
+\Sigma_{\textrm{estimate}}&=&\frac{1}{n}(x-\mu)^T(x-\mu)
+\end{eqnarray}
+
+\begin{eqnarray}
+\vec{\mu}_{\textrm{estimate}}&\sim&N(\vec{\mu},\frac{\Sigma}{n})\\
+(n-1)\Sigma_{\textrm{estimate}}&\sim&W_p(\Sigma,n-1)
+\end{eqnarray}
+
+It is know that if $X\sim W_p(V,n)$
+\begin{eqnarray}
+E(\ln|X|)=\psi_p(\frac{n}{2})+p\ln(2)+\ln|V|
+\end{eqnarray}
+where $\psi_p$ is the multivariate digamma function, which can be computed from digamma function
+\begin{eqnarray}
+\psi_p(a)=\sum_{i=1}^p\psi(a+\frac{1-i}{2})
+\end{eqnarray}
+
+The R script will verify the above formula in this case, which is
+\begin{eqnarray}
+E(\ln|\Sigma_{\textrm{estimate}}|)=\psi_2(\frac{n-1}{2})+2\ln\frac{2}{n-1}+\ln|\Sigma|
+\end{eqnarray}
+\end{enumerate}
+\end{document}

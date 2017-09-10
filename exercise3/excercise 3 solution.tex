@@ -1,0 +1,253 @@
+\documentclass{article}
+\usepackage{enumerate}
+\begin{document}
+\section{Basic concept}
+\subsection{Bias-variance decomposition}
+Define $e(x)=f(x)-\hat{f}(x)$ and $p(e)$ as its pdf.
+\begin{equation}
+\textrm{MSE}=E(e^2)=\int e^2pde=(\int epde)^2+(\int e^2pde-(\int epde)^2)=E(e)^2+Var(e)
+\end{equation}
+\subsection{A simple example}
+\begin{enumerate}[(A)]
+\item
+$Y$ follows binomal distribution $B(n,\pi_h)$. $E(Y)=n\pi_h$, $Var(Y)=n\pi_h(1-\pi_h)$. One can estimate $f(0)$ by
+\begin{equation}
+f(0)_{\textrm{estimate}}=\frac{Y}{nh}
+\end{equation}
+\item
+\begin{eqnarray}
+\pi_h&\approx&hf(0)+\frac{f^{\prime\prime}(0)}{2}\int x^2dx\nonumber\\
+&=&hf(0)+\frac{f^{\prime\prime}(0)h^3}{24}
+\end{eqnarray}
+
+Choosing $h$ so that both $h\ll 1$ and $\pi_h\ll 1$ are true, we have
+\begin{eqnarray}
+\textrm{MSE}(0)&=&(E(\hat{f}(0))-f(0))^2+Var(\hat{f}(0))\nonumber\\
+&\approx&(\frac{\pi_h}{h}-f(0))^2+\frac{\pi_h}{nh^2}\nonumber\\
+&=&(\frac{f^{\prime\prime}(0)}{24})^2h^4+\frac{1}{nh}(f(0)+\frac{f^{\prime\prime}(0)h^2}{24})\nonumber\\
+&\approx&(\frac{f^{\prime\prime}(0)}{24})^2h^4+\frac{1}{nh}f(0)
+\end{eqnarray}
+\item
+\begin{eqnarray}
+\frac{\partial\textrm{MSE}(0)}{\partial h}=4Ah^3-\frac{f(0)}{nh^2}
+\end{eqnarray}
+In order to minimize the MSE, $h=(\frac{f(0)}{4An})^{\frac{1}{5}}$
+\end{enumerate}
+\section{Curve Fitting by linear smoothing}
+\begin{enumerate}[(A)]
+\item
+\begin{eqnarray}
+y_{\textrm{estimate}}&=&\beta_{\textrm{estimate}}x\nonumber\\
+&=&(\vec{x}^T\vec{x})^{-1}\vec{x}^T\vec{y}x\nonumber\\
+&=&\frac{\sum_ix_iy_i}{\sum_ix_i^2}x\nonumber\\
+&=&\sum_i\frac{x_ix}{\vec{x}^2}y_i
+\end{eqnarray}
+So we have $\omega_i=\frac{x_ix}{\vec{x}^2}$
+\item
+
+See "linear smoothing$\backslash$linear smoothing.r" and "linear smoothing$\backslash$weight.r".
+\end{enumerate}
+
+\section{Cross validation}
+\begin{enumerate}[(A)]
+\item
+See "linear smoothing$\backslash$weight.r"
+\item
+See "linear smoothing$\backslash$testmodel.r"
+\item
+\end{enumerate}
+
+\section{Local polynomial regression}
+\begin{enumerate}[(A)]
+\item
+Define matrix $R$ where $R_{ij}(\vec{x})=(x_i-x)^{j-1}$. Then $g(x_i,a)=(R\vec{a})_i$. The cost function can be written as
+\begin{eqnarray}
+\sum_{i=1}^n\omega_i(y_i-(R\vec{a})_i)^2
+\end{eqnarray}
+Optimizing this with $\vec{a}$ is equivalent to linear regression on $f(\vec{x})=\vec{x}^T\vec{a}$ given observed data $X=R$ and $\vec{y}$ and weighted cost function. The answer is
+\begin{eqnarray}
+\vec{a}=(R^T\Omega R)^{-1}R^T\Omega\vec{y}
+\end{eqnarray}
+\begin{eqnarray}
+\Omega=\textrm{diag}(\omega_1,\omega_2,\cdots)
+\end{eqnarray}
+The estimate of $f(x)$ is just $g(x,a)=a_0$.
+\item
+Call the old weight function $\omega$ and the new ones $\gamma$
+\begin{eqnarray}
+(R^T\Omega R)^{-1}&=&\left( \begin{array}{cc}
+\sum_i\omega_i & \sum_iR_{i2}\omega_i \\
+\sum_iR_{i2}\omega_i & \sum_i R_{i2}^2\omega_i  \end{array} \right)^{-1}\nonumber\\
+&=&\frac{1}{(\sum_i\omega_i)( \sum_i R_{i2}^2\omega_i )-(\sum_iR_{i2}\omega_i)^2 }\left( \begin{array}{cc}
+\sum_i R_{i2}^2\omega_i & -\sum_iR_{i2}\omega_i \\
+-\sum_iR_{i2}\omega_i & \sum_i\omega_i  \end{array} \right)
+\end{eqnarray}
+\begin{eqnarray}
+R^T\Omega\vec{y}=\left( \begin{array}{c}
+\sum_i\omega_iy_i \\
+\sum_iR_{i2}\omega_iy_i \end{array} \right)
+\end{eqnarray}
+\begin{eqnarray}
+f(x)=a_0&=&\frac{(\sum_i R_{i2}^2\omega_i)(\sum_i\omega_iy_i)-(\sum_iR_{i2}\omega_i)(\sum_iR_{i2}\omega_iy_i)}{(\sum_i\omega_i)( \sum_i R_{i2}^2\omega_i )-(\sum_iR_{i2}\omega_i)^2 }\nonumber\\
+&=&\sum_i\frac{((\sum_jR_{j2}^2\omega_j)-(\sum_jR_{j2}\omega_j)R_{i2})\omega_i}{\sum_k((\sum_jR_{j2}^2\omega_j)-(\sum_jR_{j2}\omega_j)R_{k2})\omega_k}y_i
+\end{eqnarray}
+Define weight function $\gamma(x_i,x)=((\sum_jR_{j2}^2\omega_j)-(\sum_jR_{j2}\omega_j)R_{i2})\omega_i$, the above can be written as a weighted sum of $y_i$. Further evaluate $\gamma$:
+\begin{eqnarray}
+\gamma(x_i,x)&=&((\sum_jR_{j2}^2\omega_j)-(\sum_jR_{j2}\omega_j)R_{i2})\omega_i\nonumber\\
+&=&\frac{1}{h^2}((\sum_j(x_j-x)^2K_j)-(\sum_j(x_j-x)K_j)(x_i-x))K_i\nonumber\\
+&=&\frac{1}{h^2}(s_2-s_1(x_i-x))K_i
+\end{eqnarray}
+Here we used $K_i$ to denote $K(\frac{x-x_i}{h})$. Since the function will be normalized so we can ignore $\frac{1}{h^2}$.
+\item
+From $y=f(x)+\epsilon$
+\begin{eqnarray}
+\textrm{Var}(\vec{y})&=&\sigma^2\\
+\textrm{Mean}(\vec{y})&=&f(\vec{x})
+\end{eqnarray}
+\begin{eqnarray}
+\textrm{Mean}(a_0)&=&\sum_i\gamma_if(x_i)\nonumber\\
+\textrm{Var}(a_0)&=&\textrm{Tr}\textrm{Var}(H\vec{y})\nonumber\\
+&=&\sum_i|\gamma(x_i,x)|^2\sigma^2
+\end{eqnarray}
+\item
+Define $\vec{\mu}=\textrm{Mean}(\vec{y})=f(\vec{x})$
+\begin{eqnarray}
+E(\sigma^2)&\propto&E((\vec{y}-H\vec{y})^T(\vec{y}-H\vec{y}))\nonumber\\
+&=&E(\vec{y}^T\vec{y})-2E(\vec{y}^TH\vec{y})+E(\vec{y}^TH^2\vec{y})\nonumber\\
+&=&E(\vec{y}^T\vec{y})-2*(\vec{\mu}^TH\vec{\mu}+\sigma^2\textrm{Tr}(H))+\vec{\mu}^T(H^2)\vec{\mu}+\sigma^2\textrm{Tr}(H^2)
+\end{eqnarray}
+Apply trace trick to the first terms:
+\begin{eqnarray}
+&&E(\vec{y}^T\vec{y})=\textrm{Tr}(E(\vec{y}\vec{y}^T))=\textrm{Tr}(\sigma^2+\vec{\mu}\vec{\mu}^T)=n\sigma^2+\vec{\mu}^T\vec{\mu}
+\end{eqnarray}
+\begin{eqnarray}
+E(\sigma^2)=\sigma^2+\frac{\vec{\mu}^T(1-H)^2\vec{\mu}}{n-2\textrm{Tr}(H)+\textrm{Tr}(H^2)}
+\end{eqnarray}
+\item
+See "local polynomial regression$\backslash$utilities analysis.r" and "local polynomial regression$\backslash$local linear estimator.r"
+\item
+See "local polynomial regression$\backslash$utilities analysis.r"
+\item
+See "local polynomial regression$\backslash$utilities analysis.r"
+\end{enumerate}
+\section{Gaussian Process}
+\begin{enumerate}[(A)]
+\item
+See "gaussian process$\backslash$comparing gaussian"
+\item
+Define $C_{ij}$ to be element of covariance matrix computed by covariance function, from the joint distribution
+\begin{eqnarray}
+p(f(x_1),f(x_2),\cdots,f(x_n),f(x^*))&\propto&e^{-\frac{1}{2}\sum_{i,j}C^{-1}_{ij}(f(x_i)-m(x_i))(f(x_j)-m(x_j))}
+\end{eqnarray}
+we have
+\begin{eqnarray}
+p(f(x^*)|f(x_1),f(x_2),\cdots,f(x_n))&\propto&e^{-\frac{1}{2}(C^{-1}_{**}(f(x^*)-m(x^*))^2+2(f(x^*)-m(x^*))\sum_iC_{*i}(f(x_i)-m(x_i)))}\nonumber\\
+&\propto&e^{-\frac{C^{-1}_{**}}{2}(f(x^*)^2+2f(x^*)(\sum_i\frac{C^{-1}_{*i}}{C^{-1}_{**}}(f(x_i)-m(x_i))-m(x^*))}
+\end{eqnarray}
+So we have $(f^*|\mathbf{f})\sim N(\mathbf{m}-\frac{1}{(C^{-1})_{**}}(C^{-1})_*^T(\mathbf{f}-\mathbf{m}),\frac{1}{(C^{-1})_{**}})$
+
+We have split matrix $C$ and $C^{-1}$ as
+\begin{eqnarray}
+\left( \begin{array}{cc}
+C_{**} & C_*^T \\
+C_* & C_0  \end{array} \right)
+\end{eqnarray}
+We can write the element of $C^{-1}$ explicitly
+\[
+(C^{-1})_{**}=(C_{**}-C_*^TC_0^{-1}C_*)^{-1}
+\]
+\[
+\frac{(C^{-1})_*^T}{(C^{-1})_{**}}=-C_*^TC^{-1}_0
+\]
+$C_{**}$ is the covariance function evaluated at 0.
+\item
+For any linear combination of $(\vec{y},\vec{\theta})$: $(\vec{a}^T\vec{y}+\vec{b}^T\vec{\theta})$. Compute the moment generating function
+\begin{eqnarray}
+E(e^{t\vec{a}^T\vec{y}+t\vec{b}^T\vec{\theta}})&=&\int e^{t\vec{a}^T\vec{y}+t\vec{b}^T\vec{\theta}}p(\vec{y}|\vec{\theta})p(\vec{\theta})d\vec{y}d\vec{\theta}
+\end{eqnarray}
+Change the variable being integrated 
+\begin{eqnarray}
+\vec{y}&\rightarrow&\vec{y}^\prime=\vec{y}-R\vec{\theta}\\
+\vec{\theta}&\rightarrow&\vec{\theta}^\prime=\vec{\theta}-\vec{m}
+\end{eqnarray}
+The Jacobian of this transformation is $1$. The logrithmic pdf of $e^{t\vec{a}^T\vec{y}+t\vec{b}^T\vec{\theta}}$ is:
+\begin{eqnarray}
+t\vec{a}^T\vec{y}^\prime+t(\vec{b}^T+\vec{a}^TR)\vec{\theta}^\prime+t(\vec{b}^T+\vec{a}^TR)\vec{m}-\frac{\vec{y}^{T\prime}\Sigma^{-1}\vec{y}^\prime}{2}-\frac{\vec{\theta}^{T\prime}V^{-1}\vec{\theta}^\prime}{2}+\cdots
+\end{eqnarray}
+Complete the square for $\vec{y}^\prime$,
+\begin{eqnarray}
+-\frac{\vec{y}^{T\prime}\Sigma^{-1}\vec{y}^\prime}{2}+t\vec{a}^T\vec{y}^\prime=-\frac{(\vec{y}^\prime-t\Sigma\vec{a})^T\Sigma^{-1}(\vec{y}^\prime-t\Sigma\vec{a})}{2}+\frac{\vec{a}^T\Sigma\vec{a}}{2}t^2
+\end{eqnarray}
+and similarly for $\vec{\theta}^\prime$. The $t$-dependent part after the the integrating is
+\begin{eqnarray}
+\exp\left(\frac{\vec{a}^T\Sigma\vec{a}+(\vec{b}+R^T\vec{a})^TV(\vec{b}+R^T\vec{a})}{2}t^2+(\vec{b}^T+R^T\vec{a})t\right)
+\end{eqnarray}
+The coefficient of $t^2$ is positive definite. And the constant multiplied to this exponential must be $1$ because $M(0)=E(1)=1$.
+\end{enumerate}
+\section{In nonparametric regression and spatial smoothing}
+\begin{enumerate}[(A)]
+\item
+\begin{eqnarray}
+p(\vec{y},f(\vec{x}))=p(\vec{y}|f(\vec{x}))p(f(\vec{x}))\propto e^{-\frac{|\vec{y}-f(\vec{x})|^2}{2\sigma^2}}e^{-\frac{f(\vec{x})^TC^{-1}f(\vec{x})}{2}}
+\end{eqnarray}
+\begin{eqnarray}
+p(f(\vec{x})|\vec{y})&\propto&p(\vec{y},f(\vec{x}))|_{f(\vec{x})}\nonumber\\
+&\propto&e^{-\frac{f(\vec{x})^T(C_0^{-1}+\frac{1}{\sigma^2})f(\vec{x})}{2}+\frac{\vec{y}^Tf(\vec{x})}{\sigma^2}}\nonumber\\
+&\propto&e^{-\frac{(f(\vec{x})-(C_0^{-1}\sigma^2+1)^{-1}\vec{y})^T(C_0^{-1}+\frac{1}{\sigma^2})(f(\vec{x})-(C_0^{-1}\sigma^2+1)^{-1}\vec{y})}{2}}
+\end{eqnarray}
+Therefore $\mathbf{f}|\mathbf{y}\sim N\left((C_0^{-1}\sigma^2+1)^{-1}\mathbf{y},\sigma^2(C_0^{-1}\sigma^2+1)^{-1})\right)$
+
+Using Woodbury identity's special case where both matrix are full rank.
+\[
+(A^{-1}+B^{-1})^{-1}=A-A(A+B)^{-1}A
+\]
+we have
+\[
+(C_0^{-1}\sigma^2+1)^{-1}=\frac{C_0}{\sigma^2}\left(1-(C_0+\sigma^2)^{-1}C_0\right)=C_0(C_0+\sigma^2)^{-1}
+\]
+or
+\[
+(C_0^{-1}\sigma^2+1)^{-1}=1-(\frac{C_0}{\sigma^2}+1)^{-1}
+\]
+
+\item
+From previous question $E(f^*|\mathbf{f})=C_*^TC_0^{-1}\mathbf{f}$ and $E(\mathbf{f}|\mathbf{y})=(C_0^{-1}\sigma^2+1)^{-1}\mathbf{y}$. We have
+\begin{eqnarray}
+E(f(x^*)|\vec{y})&=&\int E(f(x^*)|f(\vec{x}))p(f(\vec{x})|\vec{y})df(\vec{x})\nonumber\\
+&=&\int C_*^TC_0^{-1}\mathbf{f}p(f(\vec{x})|\vec{y})df(\vec{x})\nonumber\\ 
+&=&C_*^TC_0^{-1}E(\mathbf{f}|\mathbf{y})=W^T\mathbf{y}
+\end{eqnarray}
+Where $W^T=C_*^TC_0^{-1}(C_0^{-1}\sigma^2+1)^{-1}=C_*^T(C_0+\sigma^2)^{-1}$.
+
+To compute variance, first compute $E(f(x^*)^2)$, using $Var(x)=E(x^2)-E(x)^2$ and the fact $x_i$ are independent of each other
+\begin{eqnarray}
+E(f^{*2}|\mathbf{y})&=&\int E(f(x^*)^2|\vec{x})p(f(\vec{x})|\vec{y})df(\vec{x})\nonumber\\
+&=&\int(Var(f^*|\mathbf{f})+(C_*^TC_0^{-1}\mathbf{f})^2)p(f(\vec{x})|\vec{y})df(\vec{x})\nonumber\\
+&=&Var(f^*|\mathbf{f})+C_*^TC_0^{-1}EC_0^{-1}C_*
+\end{eqnarray}
+Where 
+\begin{eqnarray}
+E&=&E(\mathbf{f}\mathbf{f}^T|\mathbf{y})\nonumber\\
+&=&Cov(\mathbf{f}|\mathbf{y})+E(\mathbf{f}|\mathbf{y})E(\mathbf{f}|\mathbf{y})^T
+\end{eqnarray}
+so
+\begin{eqnarray}
+E(f^{*2}|\mathbf{y})&=&Var(f^*|\mathbf{f})+C_*^TC_0^{-1}(Cov(\mathbf{f}|\mathbf{y})+E(\mathbf{f}|\mathbf{y})E(\mathbf{f}|\mathbf{y})^T)C_0^{-1}C_*\nonumber\\
+&=&Var(f^*|\mathbf{f})+C_*^TC_0^{-1}Cov(\mathbf{f}|\mathbf{y})C_0^{-1}C_*+E(f^*|\mathbf{y})^2\nonumber\\
+&=&C_{**}-C_*^TC_0^{-1}C_*+C_*^TC_0^{-1}C_0\left(1-(C_0+\sigma^2)^{-1}C_0\right))C_0^{-1}C_*+E(f^*|\mathbf{y})^2\nonumber\\
+&=&C_{**}-C_*^T(C_0+\sigma^2)^{-1}C_*+E(f^*|\mathbf{y})^2
+\end{eqnarray}
+So
+\[
+Var(f^*|\mathbf{y})=C_{**}-C_*^T(C_0+\sigma^2)^{-1}C_*
+\]
+\item
+See "non-parametric regression and spatial smoothing$\backslash$utilities analysis nonparametric regression.r".
+\item
+$\mathbf{y}=\mathbf{f}+\epsilon$. Given grid $(x_1,x_2\cdots)$, $\mathbf{y}$ is the sum of two independent multivariate normal distribution. $\mathbf{y}\sim N(0,C_0+\sigma^2)$
+\item
+See "non-parametric regression and spatial smoothing$\backslash$utilities analysis nonparametric regression.r".
+\item
+See "non-parametric regression and spatial smoothing$\backslash$weather.r".
+\end{enumerate}
+\end{document}
